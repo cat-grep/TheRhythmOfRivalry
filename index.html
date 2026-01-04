@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/data/american-football-svgrepo-com.svg" />
+    <title>The Rhythm of Rivalry: A Visual Story of College Fight Songs</title>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Graduate&family=DM+Sans:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <div class="cover-section">
+        <div class="cover-overlay">
+            <h1 class="cover-title">The Rhythm of Rivalry</h1>
+            <p class="cover-subtitle">A Visual Story of College Fight Songs</p>
+        </div>
+        <div class="scroll-hint">Scroll to Explore ▼ </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div id="section-legend" class="section">
+                <h3>Conference Color Legend</h3>
+                <p class="desc">Conferences group schools that often share similar traditions and competitive
+                    environments.
+                    Using color by conference makes it easier to spot patterns across regions and rivalries.
+                    As you scroll, notice how some musical traits repeat within the same conference.</p>
+                <div id="map-legend"></div>
+            </div>
+
+            <div id="section-map" class="section">
+                <h2>Where College Fight Songs Took Root</h2>
+                <p class="desc">Fight songs are distributed across the entire United States, reflecting the nationwide
+                    reach of college athletics.
+                    However, clear clusters appear in the <strong>Midwest and Southeast,</strong> regions with
+                    long-standing college football traditions and dense concentrations of major programs.
+                    Clicking on a stadium links geography to sound.</p>
+                <div id="map-vis" class="chart-container"></div>
+            </div>
+
+            <div id="section-bpm" class="section">
+                <h2>Tempo (Beats Per Minute)</h2>
+                <p class="desc">Most fight songs cluster in two tempo ranges: roughly <strong>70–85 BPM and 130–165
+                        BPM.</strong>
+                    Tempo alone, however, does not determine how energetic a song feels, arrangement, rhythm and
+                    instrumentation also play an important role.
+                    For example, <i>Mighty Oregon (University of Oregon)</i> and <i>Ride ’Em Cowboys (Oklahoma State
+                        University)</i>
+                    sit at very different tempos, yet both sound energetic and are well suited for marching and crowd
+                    participation.</p>
+                <div id="bpm-vis" class="chart-container"></div>
+            </div>
+
+            <div id="section-duration" class="section">
+                <h2>Song Length (Seconds)</h2>
+                <p class="desc">Fight songs are usually short so they can be easily repeated during games.
+                    Most songs last between <strong>40 and 100 seconds,</strong> while longer songs often include
+                    repeated sections or verses.
+                    For example, <i>Aggie War Hymn (Texas A&M University)</i> repeats the same melody multiple times,
+                    illustrating how fight songs
+                    prioritize being catchy, repeatable and functional in a stadium setting.</p>
+                <div id="duration-vis" class="chart-container"></div>
+            </div>
+
+            <div id="section-scatter" class="section">
+                <h2>Energy vs. Stamina</h2>
+                <p class="desc">
+                    This chart compares <strong>tempo (BPM)</strong> with <strong>song length (seconds)</strong> to
+                    examine how energy relates to duration in fight songs.
+                    While tempo clearly clusters into a few common ranges, song length appears much more variable, with
+                    no strong pattern tied to tempo.
+                    This suggests that tempo follows shared musical conventions, whereas duration is shaped more by
+                    tradition, structure or ceremonial use than by speed.
+                </p>
+                <div id="scatter-vis" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div class="info-panel-wrapper">
+            <div class="info-panel-content">
+                <div id="default-msg" class="placeholder-text">
+                    Select a school to see details.
+                </div>
+
+                <div id="detail-content" style="display: none;">
+                    <div>
+                        <div class="panel-header">School</div>
+                        <div class="panel-value large" id="info-school"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="panel-header">State</div>
+                            <div class="panel-value" id="info-state"></div>
+                        </div>
+                        <div class="col">
+                            <div class="panel-header">Conference</div>
+                            <div class="panel-value" id="info-conf" style="color: #666;"></div>
+                        </div>
+                        <div class="col">
+                            <div class="panel-header">Year</div>
+                            <div class="panel-value" id="info-year"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-header">Song Name</div>
+                    <div class="panel-value" id="info-song" style="font-size: 1rem;"></div>
+
+                    <div class="panel-header">Writer(s)</div>
+                    <div class="panel-value" id="info-writer" style="font-size: 1rem;"></div>
+
+                    <div class="panel-header">Listen</div>
+                    <div class="panel-value">
+                        <div class="spotify-container" id="spotify-embed"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="panel-header">TEMPO</div>
+                            <div class="panel-value" id="info-tempo"></div>
+                        </div>
+                        <div class="col">
+                            <div class="panel-header">Song Length</div>
+                            <div class="panel-value" id="info-length"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-header">Key Words in Fight Song Lyrics</div>
+                    <div class="panel-value">
+                        <div id="mini-radar" style="width: 100%; height: 220px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-container">
+        <div id="section-year" class="section">
+            <h2>When Fight Songs Were Written</h2>
+            <p class="desc">There is a clear <strong>“golden age”</strong> of fight song composition between
+                <strong>1905 and 1925</strong>, which aligns with the rapid rise of college football in the United
+                States.
+                Few new fight songs have been written since then, suggesting traditions tend to persist once
+                established.
+                The oldest song in the dataset, <i>The Good Old Song (University of Virginia),</i> dates back to 1893.
+            </p>
+            <div id="year-vis" class="chart-container"></div>
+        </div>
+
+        <div id="section-student" class="section">
+            <h2>Written by Students?</h2>
+            <p class="desc">Nearly <strong>half</strong> of all fight songs (about 49%) were written by students,
+                highlighting their direct role in shaping school traditions and spirit.
+                Rather than being purely institutional creations, many fight songs originated from within the student
+                body itself.
+                This helps explain why these songs often feel personal, enduring and closely tied to campus identity.
+                The variety of schools represented shows that student-driven traditions span conferences and regions,
+                not just a single type of institution.</p>
+            <div class="student-map-row">
+                <div id="student-vis" class="chart-container"></div>
+                <div id="student-map-vis" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div id="section-tropes" class="section">
+            <h2>Common Lyrics and Chants</h2>
+            <p class="desc">Unsurprisingly, the word <strong>“fight”</strong> appears most frequently across lyrics,
+                followed by common terms such as “win,” “victory” and references to school colors.
+                These simple and repetitive phrases make fight songs easy to remember and chant together in a crowd.
+                Although <strong>nonsense</strong> syllables or chants appear less often overall, they may function less
+                as filler and more as a marker of belonging, helping songs feel distinctive and meaningful to school
+                communities.</p>
+            <div id="tropes-vis" class="chart-container"></div>
+        </div>
+
+        <div id="section-radar" class="section">
+            <h2>Conference "Sonic Signatures"</h2>
+            <p class="desc">
+                Compare the average profile of two conferences. Who has more fight songs with the word
+                <strong>"Fight"</strong>?
+            </p>
+            <div class="radar-controls">
+                <div id="radar-dropdown-1" class="custom-dropdown" style="width: 160px;"></div>
+                <span style="font-weight: bold; color: #888;">VS</span>
+                <div id="radar-dropdown-2" class="custom-dropdown" style="width: 160px;"></div>
+            </div>
+            <div id="radar-vis" class="chart-container" style="display: flex; justify-content: center;"></div>
+        </div>
+
+        <div id="section-fightiest" class="section">
+            <h2>Top 10 “Fightiest” Schools</h2>
+            <p class="desc">
+                Some schools lean heavily into the word <strong>“fight”</strong> as a core part of their musical
+                identity.
+                <i>Texas Fight (University of Texas)</i> stands out by a wide margin, with significantly more “fight”
+                mentions than any other school, while the rest of the top ten cluster much closer together.
+                This suggests that while nearly all fight songs emphasize competition, a few schools amplify that
+                message far more aggressively than others.
+            </p>
+            <div id="fightiest-vis" class="chart-container"></div>
+        </div>
+
+        <div id="section-heatmap" class="section">
+            <h2>Lyric Co-occurrence</h2>
+            <p class="desc">
+                This matrix shows how often different lyric tropes appear together within the same fight song.
+                Competitive terms such as <strong>“fight,” “win,” and “victory”</strong> frequently co-occur, indicating
+                that these words tend to reinforce one another rather than appear in isolation.
+                In contrast, elements like <strong>“nonsense” and “rah”</strong> show weaker co-occurrence with other
+                tropes, suggesting they are used more selectively to add character rather than to carry the main
+                competitive message.
+            </p>
+            <div id="heatmap-vis" class="chart-container"></div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p>
+            This interactive story was inspired by the
+            <a href="https://btaa.org/technology/love-data-week/data-viz-student-championship" target="_blank">
+                BTAA Data Visualization Student Championship
+            </a>
+            and an example visualization by
+            <a href="https://web.archive.org/web/20250305132007/https:/projects.fivethirtyeight.com/college-fight-song-lyrics/"
+                target="_blank">
+                FiveThirtyEight
+            </a>.
+        </p>
+
+        <p>
+            The original fight song dataset comes from
+            <a href="https://github.com/fivethirtyeight/data/blob/master/fight-songs/fight-songs.csv" target="_blank">
+                FiveThirtyEight
+            </a>,
+            with updates provided by BTAA for the competition.
+            Stadium location data was retrieved using the
+            <a href="https://collegefootballdata.com/" target="_blank">
+                CFBD API
+            </a>.
+        </p>
+
+        <p>
+            The cover image is sourced from
+            <a href="https://mix108.com/wisconsin-jump-around-tradition/" target="_blank">
+                mix108.com
+            </a>,
+            and the football icon is from
+            <a href="https://www.svgrepo.com/svg/401099/american-football" target="_blank">
+                SVG Repo
+            </a>.
+        </p>
+
+        <p>
+            Built with
+            <a href="https://d3js.org/" target="_blank">D3.js</a>
+            and
+            <a href="https://fonts.google.com/" target="_blank">Google Fonts</a>.
+        </p>
+
+        <p class="footer-author">
+            <strong>Eugenie Huang</strong><br>
+            Master’s Student in Cartography & Geographic Information Systems<br>
+            University of Wisconsin-Madison<br>
+            <a href="mailto:huang674@wisc.edu">huang674@wisc.edu</a>
+        </p>
+    </footer>
+
+
+    <script src="/app.js"></script>
+</body>
+
+</html>
