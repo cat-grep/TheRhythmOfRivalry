@@ -217,17 +217,17 @@ p.desc {
 
 .axis text {
   fill: #888;
-  font-size: 12px;
+  font-size: 1em;
 }
 
 .axis-label {
   text-anchor: middle;
   fill: #888;
-  font-size: 12px;
+  font-size: 1em;
 }
 
 .bar-label {
-  font-size: 11px;
+  font-size: 1em;
   fill: #444;
   text-anchor: middle;
   font-weight: bold;
@@ -236,14 +236,14 @@ p.desc {
 /* Donut center text */
 .center-text {
   text-anchor: middle;
-  font-size: 14px;
+  font-size: 1.2em;
   fill: #666;
   pointer-events: none;
 }
 
 .center-text-count {
   text-anchor: middle;
-  font-size: 24px;
+  font-size: 2em;
   font-weight: bold;
   fill: #333;
   pointer-events: none;
@@ -256,7 +256,7 @@ p.desc {
   position: absolute;
   text-align: center; /* change to left if listing many schools */
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: 1em;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   border-radius: 4px;
@@ -349,7 +349,7 @@ p.desc {
 .legend-item {
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 1em;
   font-weight: 600;
   color: #555;
   cursor: pointer;
@@ -490,7 +490,7 @@ p.desc {
    ========================================================= */
 .footer {
   margin-top: auto;
-  padding: 40px;
+  padding: 40px 60px;
   border-top: 1px solid #ddd;
   text-align: left;
   font-size: 0.7rem;

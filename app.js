@@ -63,7 +63,6 @@ function drawHtmlLegend() {
         return a.localeCompare(b);
     });
 
-
     confs.forEach(conf => {
         const item = document.createElement("div");
         item.className = "legend-item";
@@ -247,7 +246,7 @@ function drawMiniRadar(d) {
             .text(m.label)
             .style("text-anchor", "middle")
             .style("alignment-baseline", "middle")
-            .style("font-size", "10px")
+            .style("font-size", "0.6em")
             .style("fill", "#999");
     });
 
@@ -349,10 +348,9 @@ function drawBeeswarmPlot(containerId, data, key, xLabel) {
 
 /* SCATTER PLOT (Energy vs Stamina) */
 function drawScatterPlot(containerId, data) {
-    const height = 400;
     const svg = d3.select(containerId).append("svg")
-        .attr("width", "100%").attr("height", height)
-        .attr("viewBox", `0 0 ${width} ${height}`);
+        .attr("width", "100%").attr("height", "100%") // Responsive
+        .attr("viewBox", `0 0 ${width} ${chartHeight}`); // Aspect Ratio
 
     const padding = { top: 20, right: 30, bottom: 50, left: 50 };
 
@@ -363,21 +361,23 @@ function drawScatterPlot(containerId, data) {
         .domain([0, d3.max(plotData, d => d.sec_duration)]).nice()
         .range([padding.left, width - padding.right]);
 
+    const yMax = d3.max(plotData, d => d.bpm);
     const yScale = d3.scaleLinear()
-        .domain([0, d3.max(plotData, d => d.bpm)]).nice()
-        .range([height - padding.bottom, padding.top]);
+        .domain([0, yMax * 1.05])
+        .range([chartHeight - padding.bottom, padding.top]);
 
     // Axes
-    svg.append("g").attr("transform", `translate(0, ${height - padding.bottom})`)
+    svg.append("g").attr("transform", `translate(0, ${chartHeight - padding.bottom})`)
         .call(d3.axisBottom(xScale)).attr("class", "axis");
     svg.append("g").attr("transform", `translate(${padding.left}, 0)`)
         .call(d3.axisLeft(yScale)).attr("class", "axis");
 
     // Labels
-    svg.append("text").attr("x", width / 2).attr("y", height - 10)
+    svg.append("text").attr("x", width / 2).attr("y", chartHeight - 10)
         .attr("class", "axis-label").text("Song Length (Seconds)");
+
     svg.append("text").attr("transform", "rotate(-90)")
-        .attr("x", -height / 2).attr("y", 15)
+        .attr("x", -chartHeight / 2).attr("y", 15) // Centered vertically
         .attr("class", "axis-label").text("Tempo (BPM)");
 
     // Dots
@@ -653,13 +653,12 @@ function drawFightiestChart(containerId, data) {
 
     const svg = d3.select(containerId)
         .append("svg")
-        .attr("width", "100%")
-        .attr("height", 300)
-        .attr("viewBox", `0 0 ${width} 300`);
+        .attr("width", "100%").attr("height", "100%")
+        .attr("viewBox", `0 0 ${width} ${chartHeight}`);
 
     const y = d3.scaleBand()
         .domain(top10.map(d => d.school))
-        .range([localMargin.top, 280])
+        .range([localMargin.top, chartHeight - localMargin.bottom]) // Dynamic height
         .padding(0.2);
 
     const x = d3.scaleLinear()
@@ -695,7 +694,7 @@ function drawFightiestChart(containerId, data) {
 
     // 5. Draw Axes
     svg.append("g")
-        .attr("transform", `translate(0, 280)`)
+        .attr("transform", `translate(0, ${chartHeight - localMargin.bottom})`)
         .call(d3.axisBottom(x).ticks(5)).attr("class", "axis");
 
     svg.append("g")
@@ -723,13 +722,13 @@ function drawRadarChart(containerId, data) {
     ];
 
     const confData = {};
-    const confTotals = {}; // NEW: Store total song counts per conference
+    const confTotals = {};
 
     conferences.forEach(c => {
         const songs = data.filter(d => d.conference === c);
         const count = songs.length;
 
-        confTotals[c] = count; // Save the total
+        confTotals[c] = count;
 
         if (count === 0) return;
 
@@ -745,17 +744,22 @@ function drawRadarChart(containerId, data) {
     });
 
     // 2. Setup SVG
-    const size = 450;
-    const margin = 70;
-    const radius = (size - margin * 2) / 2;
+    const containerWidth = d3.select(containerId).node().getBoundingClientRect().width;
+    const radarSize = Math.max(300, Math.min(containerWidth, 600));
+
+    const margin = 80;
+    const radius = (radarSize - margin * 2) / 2;
 
     d3.select(containerId).selectAll("*").remove();
 
     const svg = d3.select(containerId).append("svg")
-        .attr("width", "100%").attr("height", 500)
-        .attr("viewBox", `0 0 ${size} ${size}`);
+        .attr("width", "100%")
+        .attr("height", radarSize)
+        .attr("viewBox", `0 0 ${radarSize} ${radarSize}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
 
-    const g = svg.append("g").attr("transform", `translate(${size / 2}, ${size / 2})`);
+    const g = svg.append("g")
+        .attr("transform", `translate(${radarSize / 2}, ${radarSize / 2})`);
 
     // 3. Draw Grid
     const angleSlice = (Math.PI * 2) / metrics.length;
@@ -783,10 +787,8 @@ function drawRadarChart(containerId, data) {
         const labelY = Math.sin(angle) * (radius + 25);
         g.append("text")
             .attr("x", labelX).attr("y", labelY)
+            .attr("class", "axis-label")
             .text(m.label)
-            .style("font-size", "11px")
-            .style("fill", "#666")
-            .style("text-anchor", "middle")
             .style("alignment-baseline", "middle");
     });
 
@@ -878,7 +880,7 @@ function drawRadarChart(containerId, data) {
                 <span class="conf-icon" style="background-color: ${conferenceColors[currentVal]}"></span>
                 ${currentVal}
             </div>
-            <span>&#9662;</span>
+            <span>▾</span>
         `;
 
         const list = document.createElement("div");
@@ -933,10 +935,9 @@ function drawRadarChart(containerId, data) {
 
 /* CO-OCCURRENCE HEATMAP */
 function drawCooccurrenceHeatmap(containerId, data) {
-    const height = 400;
     const svg = d3.select(containerId).append("svg")
-        .attr("width", "100%").attr("height", height)
-        .attr("viewBox", `0 0 ${width} ${height}`);
+        .attr("width", "100%").attr("height", "100%")
+        .attr("viewBox", `0 0 ${width} ${chartHeight}`);
 
     const padding = { top: 30, right: 30, bottom: 30, left: 100 };
 
@@ -964,8 +965,14 @@ function drawCooccurrenceHeatmap(containerId, data) {
     });
 
     // Scales
-    const x = d3.scaleBand().range([padding.left, width - padding.right]).domain(vars).padding(0.05);
-    const y = d3.scaleBand().range([height - padding.bottom, padding.top]).domain(vars).padding(0.05);
+    const x = d3.scaleBand()
+        .range([padding.left, width - padding.right])
+        .domain(vars).padding(0.05);
+
+    const y = d3.scaleBand()
+        .range([chartHeight - padding.bottom, padding.top])
+        .domain(vars).padding(0.05);
+
     const color = d3.scaleSequential().interpolator(d3.interpolateBlues)
         .domain([0, d3.max(matrix, d => d.val)]);
 
@@ -987,7 +994,7 @@ function drawCooccurrenceHeatmap(containerId, data) {
         .on("mouseout", () => d3.select("#tooltip").style("opacity", 0));
 
     // Axis Labels
-    svg.append("g").attr("transform", `translate(0, ${height - padding.bottom})`)
+    svg.append("g").attr("transform", `translate(0, ${chartHeight - padding.bottom})`)
         .call(d3.axisBottom(x).tickSize(0)).select(".domain").remove();
     svg.append("g").attr("transform", `translate(${padding.left}, 0)`)
         .call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
