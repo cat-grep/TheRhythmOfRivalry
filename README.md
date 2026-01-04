@@ -5,6 +5,7 @@ This project is an interactive data-driven story exploring the **musical, lyrica
 
 The application was inspired by the **BTAA Data Visualization Student Championship** and builds upon the original fight song analysis by **FiveThirtyEight**, extending it with richer interaction, geographic context and musical interpretation.
 
+[Live Demo✨](https://cat-grep.github.io/TheRhythmOfRivalry/)
 
 
 ## Technologies Used

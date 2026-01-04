@@ -23,8 +23,8 @@ let selectedSchool = null;
 
 Promise.all([
     d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
-    d3.csv("/data/fight-songs-with-coordinates.csv"),
-    d3.xml("/data/american-football-svgrepo-com.svg")
+    d3.csv("data/fight-songs-with-coordinates.csv"),
+    d3.xml("data/american-football-svgrepo-com.svg")
 ]).then(([us, data, xml]) => {
     window.allFightSongs = data;
     const states = topojson.feature(us, us.objects.states);
