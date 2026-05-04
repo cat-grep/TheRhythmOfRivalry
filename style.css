@@ -1,11 +1,28 @@
 /* =========================================================
+   Design Tokens
+   ========================================================= */
+:root {
+    --accent:       #f0b429;   /* stadium gold */
+    --bg:           #0d1117;   /* deep dark */
+    --bg-card:      #161b22;   /* card surface */
+    --bg-header:    #1c2333;   /* card / section header strip */
+    --surface:      #161b22;
+    --text-primary: #e6edf3;
+    --text-body:    #8b949e;
+    --text-muted:   #6e7681;
+    --border:       #30363d;
+    --shadow-sm:    0 2px 8px rgba(0,0,0,0.35);
+    --shadow-md:    0 4px 20px rgba(0,0,0,0.55);
+}
+
+/* =========================================================
    Base / Reset
    ========================================================= */
 body {
     font-family: 'DM Sans', sans-serif;
     margin: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: var(--bg);
+    color: var(--text-body);
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -27,38 +44,44 @@ body {
 }
 
 .cover-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 10px 30px;
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 40px 60px;
+  border-radius: 6px;
   text-align: center;
   color: #fff;
-  backdrop-filter: blur(5px);
+  border: 1px solid rgba(240, 180, 41, 0.25);
+  backdrop-filter: blur(4px);
 }
 
 .cover-title {
-    font-family: 'Graduate', serif; /* The "Varsity" font */
+    font-family: 'Graduate', serif;
     font-size: 3.5rem;
     margin: 0;
-    font-weight: 400; /* Graduate is already bold by default */
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 4px; /* Needs more spacing to look athletic */
+    letter-spacing: 5px;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.6);
 }
 
 .cover-subtitle {
-  font-size: 1.2rem;
-  margin-top: 10px;
-  color: #eee;
+  font-size: 1rem;
+  margin-top: 14px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .scroll-hint {
   position: absolute;
-  bottom: 30px;
+  bottom: 36px;
   left: 50%;
   transform: translateX(-50%);
-  color: #fff;
-  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.7rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
   animation: bounce 2s infinite;
-  opacity: 0.8;
 }
 
 @keyframes bounce {
@@ -68,44 +91,146 @@ body {
 }
 
 /* =========================================================
+   Dashboard Nav Bar
+   ========================================================= */
+.dash-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #0d1520;
+  border-bottom: 2px solid var(--accent);
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 46px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.dash-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding-right: 24px;
+  height: 100%;
+}
+
+.dash-nav-icon {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(76%) sepia(48%) saturate(700%) hue-rotate(5deg) brightness(105%);
+}
+
+.dash-nav-title {
+  font-family: 'Graduate', serif;
+  font-size: 0.65rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.dash-nav-links {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dash-nav-links::-webkit-scrollbar { display: none; }
+
+.dash-nav-link {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0 14px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.dash-nav-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* =========================================================
    Layout (Main + Side Panel)
    ========================================================= */
 .container {
   display: flex;
   width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
   min-height: 100vh;
   flex-direction: row;
-  background-color: #f4f4f4;
+  background-color: var(--bg);
   position: relative;
 }
 
 .main-content {
-  flex: 2;
-  padding: 40px 60px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 14px 18px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .info-panel-wrapper {
-  flex: 1;
-  min-width: 300px;
-  max-width: 400px;
+  flex: 0 0 320px;
+  min-width: 260px;
+  max-width: 320px;
   position: sticky;
-  top: 0;
-  height: 100vh;
-  background: #fff;
-  border-left: 1px solid #ddd;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
+  top: 46px;          /* below the dash-nav */
+  height: calc(100vh - 46px);
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.4);
   z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-panel-header {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-header);
+  border-top: 2px solid var(--accent);
+  flex-shrink: 0;
+}
+
+.info-panel-title {
+  font-family: 'Graduate', serif;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--accent);
 }
 
 .info-panel-content {
-  height: 100%;
+  flex: 1;
   overflow-y: auto;
-  padding: 30px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 2px;
   box-sizing: border-box;
+}
+.info-panel-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* =========================================================
@@ -113,99 +238,250 @@ body {
    ========================================================= */
 .bottom-container {
   width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  flex: 2;
-  padding: 40px 60px;
+  padding: 14px 18px;
   box-sizing: border-box;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* =========================================================
-   Typography / Section Blocks
+   Section Row (paired cards side-by-side)
    ========================================================= */
-.section {
-  padding-top: 20px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid #eee;
+.section-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
 }
 
-h2 {
+/* Each card in a row becomes a flex column so the chart
+   area can grow to fill remaining height inside the card. */
+.section-row > .section {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chart container grows to fill whatever height the card has,
+   with a floor so SVGs always have space to render into. */
+.section-row > .section .chart-container {
+  flex: 1;
+  min-height: 220px;
+}
+
+/* SVG height: auto so it sizes from viewBox ratio, not from
+   the D3-set height="100%" attribute which collapses to zero
+   when the parent has no pre-defined height. */
+.section-row .chart-container svg {
+  display: block;
+  height: 100%;
+  height: auto;
+}
+
+/* =========================================================
+   Section Cards
+   ========================================================= */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Section title acts as the card header strip */
+.section h2 {
     font-family: 'Graduate', serif;
-    margin-top: 0;
-    font-size: 2.2rem;
-    color: #222;
-    border-bottom: 2px solid #ddd;
-    display: inline-block;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 7px 14px;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: 0;
+}
+
+/* Legend section uses h3 — same treatment */
+#section-legend h3 {
+    font-family: 'Graduate', serif;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 7px 14px;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+}
+
+.section p.desc {
+  color: var(--text-body);
+  line-height: 1.65;
+  margin: 0;
+  padding: 10px 14px 0;
+  font-size: 0.84rem;
+}
+
+/* Chart / visualization area inside a section card */
+.section .chart-container {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  /* padding: 8px 14px 12px; */
+  margin: 0;
+}
+
+#radar-vis,
+#year-vis,
+#scatter-vis,
+#map-vis {
+  max-width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#radar-vis svg,
+#year-vis svg,
+#scatter-vis svg,
+#map-vis svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* legend's map-legend lives inside the section, needs padding */
+#section-legend #map-legend {
+  margin: 8px 14px 12px;
+  background: var(--bg-header);
+}
+
+/* student section: two chart containers side by side */
+.section .student-map-row {
+  padding: 8px 14px 12px;
+  gap: 10px;
+}
+.section .student-map-row .chart-container {
+  padding: 6px;
+  margin: 0;
+  background: var(--bg-header);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+/* radar controls live between desc and chart */
+.section .radar-controls {
+  padding: 0 14px;
+}
+.section #radar-vis.chart-container {
+  padding: 8px 20px 20px;
 }
 
 h3 {
     font-family: 'DM Sans', sans-serif;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-p.desc {
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 20px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    margin-top: 0;
 }
 
 /* =========================================================
    Info Panel UI
    ========================================================= */
 .panel-header {
-  font-size: 0.85rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  color: #888;
-  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 3px;
 }
 
 .panel-value {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 3px;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 9px;
 }
 
 .panel-value.large {
-  font-size: 1.6rem;
-  color: #000;
+  font-size: 1.25rem;
+  color: var(--text-primary);
   border: none;
-  line-height: 1.1;
-  margin-bottom: 15px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  font-weight: 700;
 }
 
-.row { display: flex; gap: 15px; }
-.col { flex: 1; }
+/* Stat cells — give each col a mini-card look */
+.row { display: flex; gap: 8px; }
+
+.col {
+  flex: 1;
+  background: var(--bg-header);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+}
+
+.col .panel-value {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
 
 .placeholder-text {
   text-align: center;
-  color: #999;
-  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.7;
   margin: auto;
+  padding: 28px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--bg-header);
 }
 
 .spotify-container {
-  margin-top: 15px;
-  border-radius: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
   overflow: hidden;
-  background: #282828;
-  height: 170px;
+  background: #1a1a2e;
+  border: 1px solid var(--border);
+  height: 128px;
 }
 
 /* =========================================================
    Chart Containers + Axes + Labels
    ========================================================= */
 .chart-container {
-  background: #fff;
-  padding: 5px;
+  background: var(--bg-card);
+  /* padding: 16px; */
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
 .axis text, .axis-label, .bar-label, .tooltip, .radar-label {
@@ -213,22 +489,22 @@ p.desc {
 }
 
 .axis path,
-.axis line { stroke: #ddd; }
+.axis line { stroke: var(--border); }
 
 .axis text {
-  fill: #888;
-  font-size: 1em;
+  fill: var(--text-muted);
+  font-size: 0.9em;
 }
 
 .axis-label {
   text-anchor: middle;
-  fill: #888;
-  font-size: 1em;
+  fill: var(--text-muted);
+  font-size: 0.9em;
 }
 
 .bar-label {
-  font-size: 1em;
-  fill: #444;
+  font-size: 0.9em;
+  fill: var(--text-body);
   text-anchor: middle;
   font-weight: bold;
 }
@@ -237,7 +513,7 @@ p.desc {
 .center-text {
   text-anchor: middle;
   font-size: 1.2em;
-  fill: #666;
+  fill: var(--text-body);
   pointer-events: none;
 }
 
@@ -245,7 +521,7 @@ p.desc {
   text-anchor: middle;
   font-size: 2em;
   font-weight: bold;
-  fill: #333;
+  fill: var(--text-primary);
   pointer-events: none;
 }
 
@@ -254,62 +530,64 @@ p.desc {
    ========================================================= */
 .tooltip {
   position: absolute;
-  text-align: center; /* change to left if listing many schools */
-  padding: 6px 10px;
-  font-size: 1em;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  border-radius: 4px;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 0.85em;
+  background: #1c2333;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
   pointer-events: none;
   opacity: 0;
   z-index: 2000;
+  line-height: 1.5;
 }
 
 /* =========================================================
    Maps + Interaction Styles
    ========================================================= */
 .state {
-  fill: #e0e0e0;
-  stroke: #fff;
+  fill: #1e2d3d;
+  stroke: #0d1117;
   stroke-width: 1px;
 }
 
 .icon {
   cursor: pointer;
   transition: all 0.3s ease;
-  stroke: #fff;
+  stroke: #0d1117;
   stroke-width: 1.5px;
-  opacity: 0.8;
+  opacity: 0.85;
   paint-order: stroke;
 }
 
 .jitter-point {
-  stroke: #fff;
+  stroke: var(--bg);
   stroke-width: 1px;
   cursor: pointer;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .jitter-point:hover {
   opacity: 1;
-  stroke: #333;
+  stroke: var(--accent);
   stroke-width: 1.5px;
 }
 
 .layer rect {
-  stroke: #fff;
+  stroke: var(--bg);
   stroke-width: 0.5px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .dimmed {
-  opacity: 0.8 !important;
-  filter: grayscale(100%);
+  opacity: 0.25 !important;
+  filter: grayscale(80%);
 }
 
 .highlighted {
   opacity: 1 !important;
-  stroke: #fff !important;
+  stroke: var(--accent) !important;
   stroke-width: 2px !important;
   z-index: 1000;
 }
@@ -319,13 +597,13 @@ p.desc {
    ========================================================= */
 .student-map-row {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* adjust to 1fr 3fr if needed */
+  grid-template-columns: 1fr 2fr;
   gap: 20px;
   align-items: stretch;
 }
 
 #student-vis {
-  min-height: 320px;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,27 +615,28 @@ p.desc {
 #map-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 14px;
+  margin-bottom: 0;
   justify-content: center;
-  padding: 10px;
-  background: #fff;
+  padding: 14px 18px;
+  background: var(--bg-header);
   border-radius: 6px;
-  border: 1px solid #eee;
+  border: 1px solid var(--border);
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  font-size: 1em;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #555;
+  color: var(--text-body);
   cursor: pointer;
+  letter-spacing: 0.3px;
 }
 
 .legend-color {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
   margin-right: 6px;
   display: inline-block;
@@ -369,69 +648,71 @@ p.desc {
 
 /* Scatter Plot */
 .scatter-dot {
-    opacity: 0.7;
-    stroke: #fff;
+    opacity: 0.75;
+    stroke: var(--bg);
     stroke-width: 0.5px;
     transition: opacity 0.2s;
 }
 .scatter-dot:hover {
     opacity: 1;
-    stroke: #333;
-    stroke-width: 1px;
-    r: 8px; /* Grow on hover */
+    stroke: var(--accent);
+    stroke-width: 1.5px;
 }
 
 /* Radar Chart */
 .radar-grid-circle {
     fill: none;
-    stroke: #ddd;
+    stroke: var(--border);
     stroke-dasharray: 3 3;
 }
 .radar-axis-line {
-    stroke: #ccc;
+    stroke: var(--border);
     stroke-width: 1px;
 }
 .radar-area {
-    fill-opacity: 0.3;
-    stroke-width: 2px;
+    fill-opacity: 0.25;
+    stroke-width: 2.5px;
 }
 .radar-label {
     font-size: 11px;
-    fill: #666;
+    fill: var(--text-muted);
     text-anchor: middle;
 }
 
-/* CUSTOM DROPDOWN STYLES */
+/* Custom Dropdown */
 .radar-controls {
-    margin-bottom: 20px; 
-    display: flex; 
-    gap: 15px; 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 100; 
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
     position: relative;
 }
+
 .custom-dropdown {
     position: relative;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .dropdown-btn {
-    background: #fff;
-    border: 1px solid #ccc;
+    background: var(--bg-header);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
     padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    gap: 10px;
+    transition: border-color 0.15s;
 }
 
 .dropdown-btn:hover {
-    border-color: #888;
+    border-color: var(--accent);
 }
 
 .dropdown-list {
@@ -439,15 +720,15 @@ p.desc {
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
-    border: 1px solid #eee;
+    background: var(--bg-header);
+    border: 1px solid var(--border);
     border-radius: 6px;
-    margin-top: 5px;
-    max-height: 250px;
+    margin-top: 4px;
+    max-height: 240px;
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     z-index: 1000;
-    display: none; /* Hidden by default */
+    display: none;
 }
 
 .dropdown-list.show {
@@ -459,17 +740,20 @@ p.desc {
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: background 0.1s;
+    color: var(--text-body);
+    transition: background 0.1s, color 0.1s;
+    font-size: 12px;
 }
 
 .dropdown-item:hover {
-    background-color: #f4f4f4;
+    background-color: #243047;
+    color: var(--text-primary);
 }
 
 .conf-icon {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px; /* Rounded square */
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
     margin-right: 10px;
     display: inline-block;
     flex-shrink: 0;
@@ -477,78 +761,213 @@ p.desc {
 
 /* Heatmap */
 .heatmap-rect {
-    stroke: #fff;
+    stroke: var(--bg-card);
     stroke-width: 2px;
-    rx: 4; /* Rounded corners */
 }
 .heatmap-rect:hover {
-    stroke: #333;
+    stroke: var(--accent);
+    stroke-width: 2px;
 }
 
 /* =========================================================
    Footer
    ========================================================= */
 .footer {
-  margin-top: auto;
-  padding: 40px 60px;
-  border-top: 1px solid #ddd;
+  padding: 48px 64px;
+  border-top: 3px solid var(--accent);
   text-align: left;
-  font-size: 0.7rem;
-  color: #777;
-  background-color: #eee;
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: #7a8fa0;
+  background-color: #080d14;
+}
+
+.footer p {
+  margin: 0 0 10px;
 }
 
 .footer a {
-  color: #555;
+  color: #8faabf;
   text-decoration: none;
   font-weight: 600;
-  border-bottom: 1px dotted #999;
-  transition: color 0.2s;
+  border-bottom: 1px solid rgba(143,170,191,0.3);
+  transition: color 0.2s, border-color 0.2s;
 }
 
 .footer a:hover {
-  color: #000;
-  border-bottom-style: solid;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .footer-author {
-  margin-top: 20px;
-  color: #777;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  color: #6a7f90;
   text-align: right;
+  line-height: 1.8;
+}
+
+.footer-author strong {
+  color: #c8d8e8;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.footer-author a {
+  color: #6a7f90;
+  border-bottom-color: rgba(106,127,144,0.3);
 }
 
 /* =========================================================
    Responsive
    ========================================================= */
-@media (max-width: 900px) {
-  .container { flex-direction: column; }
 
-  /* Default mobile: info panel in normal flow (NOT fixed) */
-  .main-content { padding: 20px; padding-bottom: 20px; }
-  .bottom-container { padding: 15px 20px; }
+/* Medium screens — keep 2-column, tighten spacing */
+@media (max-width: 1600px) {
+  .main-content {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .bottom-container {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .info-panel-wrapper {
+    flex: 0 0 260px;
+    min-width: 220px;
+    max-width: 260px;
+  }
+  .info-panel-header {
+    padding: 7px 12px;
+  }
+  .info-panel-content {
+    padding: 10px 12px;
+  }
+  .cover-title {
+    font-size: 2.8rem;
+  }
+  .dash-nav {
+    padding: 0 16px;
+    gap: 12px;
+  }
+  .dash-nav-brand {
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .bottom-container {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .info-panel-wrapper {
+    flex: 0 0 220px;
+    min-width: 190px;
+    max-width: 220px;
+    top: 46px;
+    height: calc(100vh - 46px);
+  }
+  .cover-title {
+    font-size: 2.4rem;
+  }
+  .dash-nav-link {
+    padding: 0 8px;
+  }
+}
+
+/* Tablet — keep panel on the right, shrink it further */
+@media (max-width: 768px) {
+  .info-panel-wrapper {
+    flex: 0 0 170px;
+    min-width: 150px;
+    max-width: 170px;
+    top: 46px;
+    height: calc(100vh - 46px);
+    position: sticky;
+  }
+  .main-content {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .bottom-container {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .dash-nav-title { display: none; }
+  .dash-nav-brand { padding-right: 10px; }
+  .dash-nav { padding: 0 14px; gap: 8px; }
+}
+
+/* Mobile phones — stack layout */
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .main-content {
+    flex: none;
+    width: 100%;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .bottom-container {
+    padding: 8px 10px;
+    max-width: 100%;
+    gap: 8px;
+  }
 
   .info-panel-wrapper {
+    flex: none;
     position: static;
     width: 100%;
     height: auto;
+    min-width: 0;
     max-width: none;
     border-left: none;
-    border-top: 1px solid #ccc;
+    border-top: 2px solid var(--accent);
     box-shadow: none;
     z-index: auto;
+  }
+
+  .info-panel-header {
+    padding: 10px 14px;
+    border-top: none;
   }
 
   .info-panel-content {
     height: auto;
     overflow: visible;
-    padding: 15px 20px;
+    padding: 12px 14px;
   }
 
-  .cover-title { font-size: 2.5rem; }
+  .cover-title { font-size: 1.9rem; }
+  .cover-overlay { padding: 24px 28px; }
+
+  .footer { padding: 28px 20px; }
+  .footer-author { text-align: left; }
+
+  .dash-nav {
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .dash-nav-title { display: none; }
+  .dash-nav-brand { padding-right: 10px; }
+
+  .section .student-map-row {
+    grid-template-columns: 1fr;
+    padding: 12px 14px 14px;
+  }
 
   /* Scoped bottom sheet mode (only when enabled via JS) */
   body.mobile-sheet .main-content {
-    padding-bottom: 280px;
+    padding-bottom: 270px;
   }
 
   body.mobile-sheet .info-panel-wrapper {
@@ -558,12 +977,12 @@ p.desc {
     bottom: 0;
     top: auto;
 
-    height: 260px;
+    height: 250px;
     max-height: 50vh;
 
-    border-top: 1px solid #ccc;
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-    background: #fff;
+    border-top: 2px solid var(--accent);
+    box-shadow: 0 -6px 20px rgba(0,0,0,0.6);
+    background: var(--bg-card);
     z-index: 1000;
 
     padding-bottom: env(safe-area-inset-bottom);
@@ -577,5 +996,9 @@ p.desc {
 
   .student-map-row {
     grid-template-columns: 1fr;
+  }
+
+  .section-row {
+    flex-direction: column;
   }
 }

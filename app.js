@@ -1,11 +1,15 @@
 const width = 800;
-const mapHeight = 500;
-const chartHeight = 350;
-const margin = { top: 30, right: 30, bottom: 40, left: 40 };
+const mapHeight = 420;
+const chartHeight = 290;
+const margin = { top: 24, right: 24, bottom: 36, left: 36 };
 
 const conferenceColors = {
-    "ACC": "#013ca6", "Big 12": "#ef473e", "Big Ten": "#0088ce",
-    "Pac-12": "#00274d", "SEC": "#F1B82D", "Independent": "#9abd55"
+    "ACC": "#14b8a6",      // teal — distinct from Big Ten blue
+    "Big 12": "#ef473e",
+    "Big Ten": "#0088ce",
+    "Pac-12": "#a06cd5",   // purple — replaces near-black #00274d
+    "SEC": "#f97316",      // orange — distinct from theme gold
+    "Independent": "#9abd55"
 };
 const studentColors = { "Yes": "#1b9e77", "No": "#7570b3", "Unknown": "#bababa" };
 
@@ -524,8 +528,8 @@ function drawDonutChart(containerId, data) {
     const size = Math.min(containerWidth, containerHeight);
 
     const svg = container.append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
+        .attr("width", "80%")
+        .attr("height", "80%")
         .attr("viewBox", `0 0 ${size} ${size}`);
 
     const radius = size * 0.5;
@@ -1002,7 +1006,7 @@ function drawCooccurrenceHeatmap(containerId, data) {
 
 // Mobile-only: keep info panel as bottom sheet only for map + 2 jitter plots
 function setupScopedMobileBottomSheet() {
-    const mq = window.matchMedia("(max-width: 900px)");
+    const mq = window.matchMedia("(max-width: 600px)");
 
     const startEl = document.querySelector("#section-map");
     const endEl = document.querySelector("#section-duration"); // last section that should use sheet
