@@ -14,13 +14,13 @@
     --shadow-sm:    0 2px 8px rgba(0,0,0,0.35);
     --shadow-md:    0 4px 20px rgba(0,0,0,0.55);
     --nav-height:   46px;
-    --page-gutter:  clamp(10px, 1.2vw, 22px);
-    --page-max-width: min(100%, 1840px);
-    --story-max-width: min(100%, 1640px);
+    --page-gutter:  clamp(10px, 1vw, 18px);
+    --page-max-width: 100%;
+    --story-max-width: 100%;
     --section-gap:  10px;
     --panel-width:  clamp(280px, 24vw, 340px);
-    --chart-width:  min(100%, 760px);
-    --overview-map-width: min(100%, 1040px);
+    --chart-width:  min(100%, 960px);
+    --overview-map-width: min(100%, 1240px);
     --compact-chart-width: min(100%, 640px);
     --circle-chart-width: min(100%, 480px);
     --donut-chart-width: 260px;
@@ -37,7 +37,7 @@
 
 html {
     scroll-behavior: smooth;
-    font-size: clamp(16px, 0.92vw, 18px);
+    font-size: clamp(16px, 1vw, 20px);
 }
 
 body {
@@ -152,7 +152,7 @@ body {
 
 .dash-nav-title {
   font-family: 'Graduate', serif;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   letter-spacing: 2.5px;
   text-transform: uppercase;
   color: var(--accent);
@@ -168,7 +168,7 @@ body {
 .dash-nav-links::-webkit-scrollbar { display: none; }
 
 .dash-nav-link {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--text-muted);
@@ -321,7 +321,7 @@ body {
     box-sizing: border-box;
     margin: 0;
     padding: 7px 14px;
-    font-size: 0.6rem;
+    font-size: 0.68rem;
     letter-spacing: 3px;
     font-weight: 400;
     text-transform: uppercase;
@@ -340,7 +340,7 @@ body {
     box-sizing: border-box;
     margin: 0;
     padding: 7px 14px;
-    font-size: 0.6rem;
+    font-size: 0.68rem;
     letter-spacing: 3px;
     font-weight: 400;
     text-transform: uppercase;
@@ -355,7 +355,7 @@ body {
   line-height: 1.65;
   margin: 0;
   padding: 10px 14px 0;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
 }
 
 /* Chart / visualization area inside a section card */
