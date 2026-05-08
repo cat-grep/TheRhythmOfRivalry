@@ -1,5 +1,5 @@
 const width = 800;
-const mapHeight = 420;
+const mapHeight = 500;
 const chartHeight = 290;
 const margin = { top: 24, right: 24, bottom: 36, left: 36 };
 
@@ -284,7 +284,13 @@ function drawMap(us, data, xml) {
     const svg = d3.select("#map-vis").append("svg").attr("width", "100%").attr("height", "100%")
         .attr("viewBox", `0 0 ${width} ${mapHeight}`).attr("preserveAspectRatio", "xMidYMid meet");
 
-    const projection = d3.geoAlbersUsa().scale(1000).translate([width / 2, mapHeight / 2]);
+    const statesFeature = topojson.feature(us, us.objects.states);
+    const mapPadding = 42;
+    const projection = d3.geoAlbersUsa()
+        .fitExtent(
+            [[mapPadding, mapPadding], [width - mapPadding, mapHeight - mapPadding]],
+            statesFeature
+        );
     const path = d3.geoPath().projection(projection);
 
     const importedNode = document.importNode(xml.documentElement, true);
@@ -293,7 +299,7 @@ function drawMap(us, data, xml) {
     svg.append("defs").node().appendChild(icon.node());
 
     svg.append("g").selectAll("path")
-        .data(topojson.feature(us, us.objects.states).features)
+        .data(statesFeature.features)
         .join("path").attr("class", "state").attr("d", path);
 
     svg.append("g").selectAll("use")
