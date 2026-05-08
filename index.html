@@ -118,7 +118,7 @@
                     Click any school on the map or charts to explore its fight song, tempo, and lyrics.
                 </div>
 
-                <div id="detail-content" style="display: none;">
+                <div id="detail-content" class="detail-content is-hidden">
                     <div>
                         <div class="panel-header">School</div>
                         <div class="panel-value large" id="info-school"></div>
@@ -131,7 +131,7 @@
                         </div>
                         <div class="col">
                             <div class="panel-header">Conference</div>
-                            <div class="panel-value" id="info-conf" style="color: #666;"></div>
+                            <div class="panel-value conference-value" id="info-conf"></div>
                         </div>
                         <div class="col">
                             <div class="panel-header">Year</div>
@@ -140,10 +140,10 @@
                     </div>
 
                     <div class="panel-header">Song Name</div>
-                    <div class="panel-value" id="info-song" style="font-size: 1rem;"></div>
+                    <div class="panel-value panel-value-text" id="info-song"></div>
 
                     <div class="panel-header">Writer(s)</div>
-                    <div class="panel-value" id="info-writer" style="font-size: 1rem;"></div>
+                    <div class="panel-value panel-value-text" id="info-writer"></div>
 
                     <div class="panel-header">Listen</div>
                     <div class="panel-value">
@@ -163,7 +163,7 @@
 
                     <div class="panel-header">Key Words in Fight Song Lyrics</div>
                     <div class="panel-value">
-                        <div id="mini-radar" style="width: 100%; height: 120px;"></div>
+                        <div id="mini-radar" class="mini-radar"></div>
                     </div>
                 </div>
             </div>
@@ -216,11 +216,11 @@
                     <strong>"Fight"</strong>?
                 </p>
                 <div class="radar-controls">
-                    <div id="radar-dropdown-1" class="custom-dropdown" style="width: 160px;"></div>
-                    <span style="font-weight: bold; color: #888;">VS</span>
-                    <div id="radar-dropdown-2" class="custom-dropdown" style="width: 160px;"></div>
+                    <div id="radar-dropdown-1" class="custom-dropdown custom-dropdown-conference"></div>
+                    <span class="vs-label">VS</span>
+                    <div id="radar-dropdown-2" class="custom-dropdown custom-dropdown-conference"></div>
                 </div>
-                <div id="radar-vis" class="chart-container" style="display: flex; justify-content: center;"></div>
+                <div id="radar-vis" class="chart-container chart-container-centered"></div>
             </div>
         </div>
 

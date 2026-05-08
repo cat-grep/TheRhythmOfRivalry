@@ -13,11 +13,29 @@
     --border:       #30363d;
     --shadow-sm:    0 2px 8px rgba(0,0,0,0.35);
     --shadow-md:    0 4px 20px rgba(0,0,0,0.55);
+    --nav-height:   46px;
+    --page-gutter:  clamp(10px, 2vw, 18px);
+    --section-gap:  10px;
+    --panel-width:  clamp(280px, 24vw, 340px);
+    --chart-width:  min(100%, 760px);
+    --compact-chart-width: min(100%, 640px);
+    --circle-chart-width: min(100%, 480px);
+    --donut-chart-width: 260px;
+    --mini-radar-width: 170px;
+    --conf-color:   var(--text-primary);
 }
 
 /* =========================================================
    Base / Reset
    ========================================================= */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'DM Sans', sans-serif;
     margin: 0;
@@ -25,6 +43,10 @@ body {
     color: var(--text-body);
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.is-hidden {
+  display: none !important;
 }
 
 /* =========================================================
@@ -103,7 +125,7 @@ body {
   display: flex;
   align-items: center;
   gap: 24px;
-  height: 46px;
+  height: var(--nav-height);
   box-sizing: border-box;
   width: 100%;
 }
@@ -148,7 +170,7 @@ body {
   color: var(--text-muted);
   text-decoration: none;
   padding: 0 14px;
-  height: 46px;
+  height: var(--nav-height);
   display: flex;
   align-items: center;
   border-bottom: 2px solid transparent;
@@ -166,34 +188,29 @@ body {
    Layout (Main + Side Panel)
    ========================================================= */
 .container {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--panel-width);
   width: 100%;
   max-width: 1440px;
   margin-left: auto;
   margin-right: auto;
   min-height: 100vh;
-  flex-direction: row;
   background-color: var(--bg);
   position: relative;
 }
 
 .main-content {
-  flex: 1 1 0;
   min-width: 0;
-  padding: 14px 18px;
-  box-sizing: border-box;
+  padding: var(--page-gutter);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--section-gap);
 }
 
 .info-panel-wrapper {
-  flex: 0 0 320px;
-  min-width: 260px;
-  max-width: 320px;
   position: sticky;
-  top: 46px;          /* below the dash-nav */
-  height: calc(100vh - 46px);
+  top: var(--nav-height);
+  height: calc(100vh - var(--nav-height));
   background: var(--bg-card);
   border-left: 1px solid var(--border);
   box-shadow: -4px 0 20px rgba(0,0,0,0.4);
@@ -240,19 +257,19 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 14px 18px;
-  box-sizing: border-box;
+  padding: var(--page-gutter);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--section-gap);
 }
 
 /* =========================================================
    Section Row (paired cards side-by-side)
    ========================================================= */
 .section-row {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--section-gap);
   align-items: stretch;
 }
 
@@ -347,15 +364,24 @@ body {
   margin: 0;
 }
 
-#radar-vis,
 #year-vis,
 #scatter-vis,
-#map-vis {
-  max-width: 75%;
+#map-vis,
+#bpm-vis,
+#duration-vis,
+#fightiest-vis,
+#tropes-vis,
+#heatmap-vis {
+  width: var(--chart-width);
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+#radar-vis {
+  width: var(--circle-chart-width);
+  margin: 14px auto 18px;
 }
 
 #radar-vis svg,
@@ -365,6 +391,24 @@ body {
   display: block;
   width: 100%;
   height: auto;
+}
+
+#bpm-vis svg,
+#duration-vis svg,
+#fightiest-vis svg,
+#tropes-vis svg,
+#heatmap-vis svg,
+#student-map-vis svg,
+#student-vis svg,
+#mini-radar svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart-container-centered {
+  display: flex;
+  justify-content: center;
 }
 
 /* legend's map-legend lives inside the section, needs padding */
@@ -378,20 +422,13 @@ body {
   padding: 8px 14px 12px;
   gap: 10px;
 }
-.section .student-map-row .chart-container {
-  padding: 6px;
-  margin: 0;
-  background: var(--bg-header);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
 
 /* radar controls live between desc and chart */
 .section .radar-controls {
   padding: 0 14px;
 }
 .section #radar-vis.chart-container {
-  padding: 8px 20px 20px;
+  padding: 0 16px 14px;
 }
 
 h3 {
@@ -426,6 +463,10 @@ h3 {
   padding-bottom: 9px;
 }
 
+.panel-value-text {
+  font-size: 1rem;
+}
+
 .panel-value.large {
   font-size: 1.25rem;
   color: var(--text-primary);
@@ -433,6 +474,14 @@ h3 {
   line-height: 1.2;
   margin-bottom: 10px;
   font-weight: 700;
+}
+
+.conference-value {
+  color: var(--conf-color);
+}
+
+.detail-content {
+  display: block;
 }
 
 /* Stat cells — give each col a mini-card look */
@@ -471,6 +520,11 @@ h3 {
   background: #1a1a2e;
   border: 1px solid var(--border);
   height: 128px;
+}
+
+.mini-radar {
+  width: min(100%, var(--mini-radar-width));
+  margin: 0 auto;
 }
 
 /* =========================================================
@@ -523,6 +577,12 @@ h3 {
   font-weight: bold;
   fill: var(--text-primary);
   pointer-events: none;
+}
+
+.donut-note {
+  text-anchor: middle;
+  font-size: 11px;
+  fill: var(--text-muted);
 }
 
 /* =========================================================
@@ -592,6 +652,34 @@ h3 {
   z-index: 1000;
 }
 
+.mini-radar-grid,
+.mini-radar-axis {
+  fill: none;
+  stroke: var(--border);
+  stroke-dasharray: 3 3;
+}
+
+.mini-radar-axis {
+  stroke-dasharray: none;
+  stroke-width: 1px;
+}
+
+.mini-radar-label {
+  text-anchor: middle;
+  alignment-baseline: middle;
+  font-size: 0.6em;
+  fill: var(--text-muted);
+}
+
+.mini-radar-area {
+  fill-opacity: 0.2;
+  stroke-width: 2px;
+}
+
+.mini-radar-dot-muted {
+  fill: var(--border);
+}
+
 /* =========================================================
    Student Section Layout (Donut + Map)
    ========================================================= */
@@ -603,7 +691,9 @@ h3 {
 }
 
 #student-vis {
-  min-height: 300px;
+  width: min(100%, var(--donut-chart-width));
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -673,6 +763,14 @@ h3 {
     fill-opacity: 0.25;
     stroke-width: 2.5px;
 }
+.radar-point {
+    cursor: pointer;
+    fill-opacity: 0;
+    stroke: transparent;
+}
+.radar-point.is-hovered {
+    fill-opacity: 1;
+}
 .radar-label {
     font-size: 11px;
     fill: var(--text-muted);
@@ -697,6 +795,10 @@ h3 {
     color: var(--text-primary);
 }
 
+.custom-dropdown-conference {
+    width: 160px;
+}
+
 .dropdown-btn {
     background: var(--bg-header);
     border: 1px solid var(--border);
@@ -709,6 +811,13 @@ h3 {
     justify-content: space-between;
     gap: 10px;
     transition: border-color 0.15s;
+}
+
+.dropdown-btn-label,
+.tooltip-heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .dropdown-btn:hover {
@@ -757,6 +866,18 @@ h3 {
     margin-right: 10px;
     display: inline-block;
     flex-shrink: 0;
+}
+
+.conf-acc { background-color: #14b8a6; }
+.conf-big-12 { background-color: #ef473e; }
+.conf-big-ten { background-color: #0088ce; }
+.conf-pac-12 { background-color: #a06cd5; }
+.conf-sec { background-color: #f97316; }
+.conf-independent { background-color: #9abd55; }
+
+.vs-label {
+    color: var(--text-muted);
+    font-weight: 700;
 }
 
 /* Heatmap */
@@ -823,182 +944,157 @@ h3 {
    Responsive
    ========================================================= */
 
-/* Medium screens — keep 2-column, tighten spacing */
-@media (max-width: 1600px) {
-  .main-content {
-    padding: 12px 14px;
-    gap: 8px;
+@media (max-width: 1200px) {
+  :root {
+    --panel-width: 300px;
+    --chart-width: min(100%, 700px);
+    --circle-chart-width: min(100%, 440px);
+    --donut-chart-width: 240px;
+    --section-gap: 8px;
   }
-  .bottom-container {
-    padding: 12px 14px;
-    gap: 8px;
-  }
-  .info-panel-wrapper {
-    flex: 0 0 260px;
-    min-width: 220px;
-    max-width: 260px;
-  }
-  .info-panel-header {
-    padding: 7px 12px;
-  }
-  .info-panel-content {
-    padding: 10px 12px;
-  }
+
   .cover-title {
     font-size: 2.8rem;
   }
+
   .dash-nav {
     padding: 0 16px;
     gap: 12px;
   }
+
   .dash-nav-brand {
     padding-right: 12px;
   }
 }
 
-@media (max-width: 900px) {
-  .main-content {
-    padding: 10px 12px;
-    gap: 8px;
+@media (max-width: 980px) {
+  :root {
+    --chart-width: min(100%, 680px);
+    --circle-chart-width: min(100%, 400px);
+    --donut-chart-width: 230px;
   }
-  .bottom-container {
-    padding: 10px 12px;
-    gap: 8px;
-  }
-  .info-panel-wrapper {
-    flex: 0 0 220px;
-    min-width: 190px;
-    max-width: 220px;
-    top: 46px;
-    height: calc(100vh - 46px);
-  }
-  .cover-title {
-    font-size: 2.4rem;
-  }
-  .dash-nav-link {
-    padding: 0 8px;
-  }
-}
 
-/* Tablet — keep panel on the right, shrink it further */
-@media (max-width: 768px) {
-  .info-panel-wrapper {
-    flex: 0 0 170px;
-    min-width: 150px;
-    max-width: 170px;
-    top: 46px;
-    height: calc(100vh - 46px);
-    position: sticky;
-  }
-  .main-content {
-    padding: 8px 10px;
-    gap: 8px;
-  }
-  .bottom-container {
-    padding: 8px 10px;
-    gap: 8px;
-  }
-  .dash-nav-title { display: none; }
-  .dash-nav-brand { padding-right: 10px; }
-  .dash-nav { padding: 0 14px; gap: 8px; }
-}
-
-/* Mobile phones — stack layout */
-@media (max-width: 600px) {
   .container {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     max-width: 100%;
-  }
-
-  .main-content {
-    flex: none;
-    width: 100%;
-    padding: 8px 10px;
-    gap: 8px;
-  }
-
-  .bottom-container {
-    padding: 8px 10px;
-    max-width: 100%;
-    gap: 8px;
   }
 
   .info-panel-wrapper {
-    flex: none;
     position: static;
-    width: 100%;
     height: auto;
-    min-width: 0;
-    max-width: none;
     border-left: none;
     border-top: 2px solid var(--accent);
     box-shadow: none;
-    z-index: auto;
   }
 
   .info-panel-header {
-    padding: 10px 14px;
     border-top: none;
   }
 
   .info-panel-content {
-    height: auto;
     overflow: visible;
-    padding: 12px 14px;
   }
 
-  .cover-title { font-size: 1.9rem; }
-  .cover-overlay { padding: 24px 28px; }
-
-  .footer { padding: 28px 20px; }
-  .footer-author { text-align: left; }
-
-  .dash-nav {
-    padding: 0 14px;
-    gap: 8px;
-  }
-  .dash-nav-title { display: none; }
-  .dash-nav-brand { padding-right: 10px; }
-
-  .section .student-map-row {
-    grid-template-columns: 1fr;
-    padding: 12px 14px 14px;
-  }
-
-  /* Scoped bottom sheet mode (only when enabled via JS) */
-  body.mobile-sheet .main-content {
-    padding-bottom: 270px;
-  }
-
-  body.mobile-sheet .info-panel-wrapper {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: auto;
-
-    height: 250px;
-    max-height: 50vh;
-
-    border-top: 2px solid var(--accent);
-    box-shadow: 0 -6px 20px rgba(0,0,0,0.6);
-    background: var(--bg-card);
-    z-index: 1000;
-
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  body.mobile-sheet .info-panel-content {
-    height: 100%;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
+  .section-row,
   .student-map-row {
     grid-template-columns: 1fr;
   }
 
-  .section-row {
+  .dash-nav-title {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  :root {
+    --page-gutter: 10px;
+    --chart-width: 100%;
+    --circle-chart-width: min(100%, 320px);
+    --donut-chart-width: 210px;
+    --mini-radar-width: 150px;
+  }
+
+  .cover-section {
+    min-height: 560px;
+  }
+
+  .cover-overlay {
+    width: calc(100% - 40px);
+    padding: 24px 20px;
+  }
+
+  .cover-title {
+    font-size: 1.9rem;
+    letter-spacing: 2px;
+  }
+
+  .cover-subtitle {
+    font-size: 0.82rem;
+    letter-spacing: 1.2px;
+  }
+
+  .dash-nav {
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  .dash-nav-brand {
+    padding-right: 8px;
+  }
+
+  .dash-nav-link {
+    padding: 0 8px;
+    letter-spacing: 1px;
+  }
+
+  .section h2,
+  #section-legend h3 {
+    line-height: 1.45;
+    letter-spacing: 2px;
+  }
+
+  .section p.desc {
+    font-size: 0.82rem;
+  }
+
+  #year-vis,
+  #scatter-vis,
+  #map-vis,
+  #bpm-vis,
+  #duration-vis,
+  #fightiest-vis,
+  #tropes-vis,
+  #heatmap-vis {
+    margin-top: 12px;
+    margin-bottom: 14px;
+  }
+
+  #radar-vis {
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+
+  .section .student-map-row {
+    padding: 12px 14px 14px;
+  }
+
+  .radar-controls {
+    flex-wrap: wrap;
+  }
+
+  .custom-dropdown-conference {
+    width: min(160px, calc(50vw - 32px));
+  }
+
+  .row {
     flex-direction: column;
+  }
+
+  .footer {
+    padding: 28px 20px;
+  }
+
+  .footer-author {
+    text-align: left;
   }
 }

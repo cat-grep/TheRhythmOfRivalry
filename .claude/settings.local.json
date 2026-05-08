@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python3 -c \"import sys,json; lines=sys.stdin.readlines\\(\\); [print\\(l[:500]\\) for l in lines[-20:]]\")"
-    ]
-  }
-}

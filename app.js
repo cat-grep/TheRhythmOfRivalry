@@ -13,6 +13,10 @@ const conferenceColors = {
 };
 const studentColors = { "Yes": "#1b9e77", "No": "#7570b3", "Unknown": "#bababa" };
 
+function conferenceClass(conf) {
+    return `conf-${conf.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
+
 const fipsToAbbr = {
     "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE",
     "11": "DC", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA",
@@ -121,9 +125,7 @@ function highlightSchool(schoolName) {
         .classed("highlighted", d => d.school === schoolName)
         .classed("dimmed", d => d.school !== schoolName)
         .transition().duration(200)
-        .attr("r", d => d.school === schoolName ? 10 : 6)
-        .style("stroke", d => d.school === schoolName ? "#fff" : "none")
-        .style("stroke-width", d => d.school === schoolName ? 2 : 0);
+        .attr("r", d => d.school === schoolName ? 10 : 6);
 }
 
 function resetHighlight() {
@@ -146,8 +148,7 @@ function resetHighlight() {
         .classed("highlighted", false)
         .classed("dimmed", false)
         .transition().duration(200)
-        .attr("r", 6)
-        .style("stroke", "none");
+        .attr("r", 6);
 }
 
 function updateInfoPanel(d) {
@@ -156,19 +157,19 @@ function updateInfoPanel(d) {
     const spotifyDiv = document.getElementById("spotify-embed");
 
     if (!d) {
-        defaultMsg.style.display = "block";
-        content.style.display = "none";
+        defaultMsg.classList.remove("is-hidden");
+        content.classList.add("is-hidden");
         spotifyDiv.innerHTML = "";
         return;
     }
 
-    defaultMsg.style.display = "none";
-    content.style.display = "block";
+    defaultMsg.classList.add("is-hidden");
+    content.classList.remove("is-hidden");
 
     document.getElementById("info-school").textContent = d.school;
     document.getElementById("info-state").textContent = d.stateAbbr;
     document.getElementById("info-conf").textContent = d.conference;
-    document.getElementById("info-conf").style.color = conferenceColors[d.conference];
+    document.getElementById("info-conf").style.setProperty("--conf-color", conferenceColors[d.conference]);
     document.getElementById("info-song").textContent = d.song_name;
     document.getElementById("info-writer").textContent = d.writers;
     document.getElementById("info-year").textContent = d.year;
@@ -227,10 +228,9 @@ function drawMiniRadar(d) {
 
     [0.5, 1].forEach(level => {
         g.append("circle")
+            .attr("class", "mini-radar-grid")
             .attr("r", radius * level)
-            .style("fill", "none")
-            .style("stroke", "#eee")
-            .style("stroke-dasharray", "3 3");
+            .attr("fill", "none");
     });
 
     // Axis Lines & Labels
@@ -241,17 +241,14 @@ function drawMiniRadar(d) {
 
         g.append("line")
             .attr("x1", 0).attr("y1", 0).attr("x2", x).attr("y2", y)
-            .style("stroke", "#eee").style("stroke-width", 1);
+            .attr("class", "mini-radar-axis");
 
         const labelX = Math.cos(angle) * (radius + 15);
         const labelY = Math.sin(angle) * (radius + 15);
         g.append("text")
             .attr("x", labelX).attr("y", labelY)
             .text(m.label)
-            .style("text-anchor", "middle")
-            .style("alignment-baseline", "middle")
-            .style("font-size", "0.6em")
-            .style("fill", "#999");
+            .attr("class", "mini-radar-label");
     });
 
     // Draw Selected Song Shape
@@ -264,10 +261,9 @@ function drawMiniRadar(d) {
     g.append("path")
         .datum(metrics)
         .attr("d", lineGenerator)
-        .style("fill", conferenceColors[d.conference])
-        .style("fill-opacity", 0.2)
-        .style("stroke", conferenceColors[d.conference])
-        .style("stroke-width", 2);
+        .attr("class", "mini-radar-area")
+        .attr("fill", conferenceColors[d.conference])
+        .attr("stroke", conferenceColors[d.conference]);
 
     // Draw Dots
     metrics.forEach((m, i) => {
@@ -277,7 +273,8 @@ function drawMiniRadar(d) {
             .attr("cx", Math.cos(angle) * rScale(val))
             .attr("cy", Math.sin(angle) * rScale(val))
             .attr("r", 4)
-            .style("fill", val === 1 ? conferenceColors[d.conference] : "#eee");
+            .attr("class", val === 1 ? null : "mini-radar-dot-muted")
+            .attr("fill", val === 1 ? conferenceColors[d.conference] : null);
     });
 }
 
@@ -521,15 +518,11 @@ function drawTropeStackedChart(containerId, data) {
 
 function drawDonutChart(containerId, data) {
     const container = d3.select(containerId);
-
-    const containerWidth = container.node().clientWidth;
-    const containerHeight = container.node().clientHeight || 300;
-
-    const size = Math.min(containerWidth, containerHeight);
+    const size = 300;
 
     const svg = container.append("svg")
-        .attr("width", "80%")
-        .attr("height", "80%")
+        .attr("width", "100%")
+        .attr("height", "100%")
         .attr("viewBox", `0 0 ${size} ${size}`);
 
     const radius = size * 0.5;
@@ -590,7 +583,7 @@ function drawDonutChart(containerId, data) {
             ctLabel.text("Total Songs");
         });
 
-    g.append("text").attr("dy", "5em").attr("text-anchor", "middle").style("font-size", "11px").style("fill", "#aaa");
+    g.append("text").attr("dy", "5em").attr("class", "donut-note");
 }
 
 function drawStudentWriterMap(containerId, us, data) {
@@ -748,8 +741,7 @@ function drawRadarChart(containerId, data) {
     });
 
     // 2. Setup SVG
-    const containerWidth = d3.select(containerId).node().getBoundingClientRect().width;
-    const radarSize = Math.max(300, Math.min(containerWidth, 600));
+    const radarSize = 600;
 
     const margin = 80;
     const radius = (radarSize - margin * 2) / 2;
@@ -772,10 +764,7 @@ function drawRadarChart(containerId, data) {
     [0.2, 0.4, 0.6, 0.8, 1].forEach(p => {
         g.append("circle")
             .attr("class", "radar-grid-circle")
-            .attr("r", radius * p)
-            .style("fill", "none")
-            .style("stroke", "#e0e0e0")
-            .style("stroke-dasharray", "3 3");
+            .attr("r", radius * p);
     });
 
     metrics.forEach((m, i) => {
@@ -785,15 +774,14 @@ function drawRadarChart(containerId, data) {
 
         g.append("line")
             .attr("x1", 0).attr("y1", 0).attr("x2", x).attr("y2", y)
-            .style("stroke", "#ccc").style("stroke-width", "1px");
+            .attr("class", "radar-axis-line");
 
         const labelX = Math.cos(angle) * (radius + 25);
         const labelY = Math.sin(angle) * (radius + 25);
         g.append("text")
             .attr("x", labelX).attr("y", labelY)
             .attr("class", "axis-label")
-            .text(m.label)
-            .style("alignment-baseline", "middle");
+            .text(m.label);
     });
 
     // --- STATE MANAGEMENT ---
@@ -817,10 +805,8 @@ function drawRadarChart(containerId, data) {
                 });
                 return "M" + coords.map(c => c.join(",")).join("L") + "Z";
             })
-            .style("fill", d => conferenceColors[d])
-            .style("fill-opacity", 0.2)
-            .style("stroke", d => conferenceColors[d])
-            .style("stroke-width", 2.5);
+            .attr("fill", d => conferenceColors[d])
+            .attr("stroke", d => conferenceColors[d]);
 
         // 2. Draw Tooltip Circles
         g.selectAll(".radar-point-group").remove();
@@ -845,26 +831,24 @@ function drawRadarChart(containerId, data) {
                 .attr("cx", d => Math.cos(d.angle) * rScale(d.val))
                 .attr("cy", d => Math.sin(d.angle) * rScale(d.val))
                 .attr("r", 6)
-                .style("fill", conferenceColors[conf])
-                .style("fill-opacity", 0)
-                .style("stroke", "transparent")
-                .style("cursor", "pointer")
+                .attr("class", "radar-point")
+                .attr("fill", conferenceColors[conf])
                 .on("mouseover", function (e, d) {
-                    d3.select(this).style("fill-opacity", 1);
+                    d3.select(this).classed("is-hovered", true);
 
                     // NEW: Calculate Count (Ratio * Total)
                     const count = Math.round(d.val * d.totalCount);
 
                     showTooltip(e,
-                        `<div style="display:flex; align-items:center; gap:5px;">
-                            <div style="width:10px; height:10px; background:${conferenceColors[d.conf]};"></div>
+                        `<div class="tooltip-heading">
+                            <span class="conf-icon ${conferenceClass(d.conf)}"></span>
                             <strong>${d.conf}</strong>
                          </div>
                          ${d.metric}: ${count}`
                     );
                 })
                 .on("mouseout", function () {
-                    d3.select(this).style("fill-opacity", 0);
+                    d3.select(this).classed("is-hovered", false);
                     d3.select("#tooltip").style("opacity", 0);
                 });
         });
@@ -880,8 +864,8 @@ function drawRadarChart(containerId, data) {
         const btn = document.createElement("div");
         btn.className = "dropdown-btn";
         btn.innerHTML = `
-            <div style="display:flex; align-items:center;">
-                <span class="conf-icon" style="background-color: ${conferenceColors[currentVal]}"></span>
+            <div class="dropdown-btn-label">
+                <span class="conf-icon ${conferenceClass(currentVal)}"></span>
                 ${currentVal}
             </div>
             <span>▾</span>
@@ -894,7 +878,7 @@ function drawRadarChart(containerId, data) {
             const item = document.createElement("div");
             item.className = "dropdown-item";
             item.innerHTML = `
-                <span class="conf-icon" style="background-color: ${conferenceColors[opt]}"></span>
+                <span class="conf-icon ${conferenceClass(opt)}"></span>
                 ${opt}
             `;
             item.onclick = () => {
@@ -1004,41 +988,3 @@ function drawCooccurrenceHeatmap(containerId, data) {
         .call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
 }
 
-// Mobile-only: keep info panel as bottom sheet only for map + 2 jitter plots
-function setupScopedMobileBottomSheet() {
-    const mq = window.matchMedia("(max-width: 600px)");
-
-    const startEl = document.querySelector("#section-map");
-    const endEl = document.querySelector("#section-duration"); // last section that should use sheet
-
-    if (!startEl || !endEl) return;
-
-    const update = () => {
-        // Only apply logic on mobile
-        if (!mq.matches) {
-            document.body.classList.remove("mobile-sheet");
-            return;
-        }
-
-        const startRect = startEl.getBoundingClientRect();
-        const endRect = endEl.getBoundingClientRect();
-
-        // "Active range" = when we've reached section-map, but haven't scrolled past section-duration
-        const inRange = (startRect.top <= 0) && (endRect.bottom > 0);
-
-        document.body.classList.toggle("mobile-sheet", inRange);
-    };
-
-    // Use IntersectionObserver for robustness + a scroll fallback
-    const io = new IntersectionObserver(update, { threshold: [0, 0.01, 1] });
-    io.observe(startEl);
-    io.observe(endEl);
-
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    mq.addEventListener?.("change", update);
-
-    update();
-}
-
-setupScopedMobileBottomSheet();
