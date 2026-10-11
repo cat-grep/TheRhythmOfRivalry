@@ -6,313 +6,430 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="data/american-football-svgrepo-com.svg" />
     <title>The Rhythm of Rivalry: A Visual Story of College Fight Songs</title>
+    <meta name="description"
+        content="An interactive, map-first story about the tempo, lyrics, history and rivalries of 65 U.S. college fight songs.">
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Graduate&family=DM+Sans:wght@300;400;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Graduate&family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
         rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <a class="skip-link" href="#q1">Skip to the story</a>
+    <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
 
-    <div id="tooltip" class="tooltip"></div>
-
-    <div class="cover-section">
+    <!-- ================= COVER ================= -->
+    <header class="cover-section" id="top">
         <div class="cover-overlay">
+            <p class="cover-kicker">A visual story of college fight songs</p>
             <h1 class="cover-title">The Rhythm of Rivalry</h1>
-            <p class="cover-subtitle">A Visual Story of College Fight Songs</p>
+            <p class="cover-subtitle">65 schools · 65 songs · one very loud Saturday</p>
+            <div class="scoreboard" id="scoreboard" aria-label="Key numbers"></div>
         </div>
-        <div class="scroll-hint">Scroll to Explore &nbsp;▼</div>
-    </div>
+        <div class="scroll-hint">Kick off &nbsp;▼</div>
+    </header>
 
-    <nav class="dash-nav">
-        <div class="dash-nav-brand">
-            <!-- <img src="data/american-football-svgrepo-com.svg" class="dash-nav-icon" alt="" /> -->
+    <!-- ================= NAV ================= -->
+    <nav class="dash-nav" aria-label="Chapters">
+        <a class="dash-nav-brand" href="#top" data-nav>
+            <img src="data/american-football-svgrepo-com.svg" class="dash-nav-icon" alt="" />
             <span class="dash-nav-title">Rhythm of Rivalry</span>
-        </div>
+        </a>
         <div class="dash-nav-links">
-            <a href="#section-legend"  class="dash-nav-link">Conferences</a>
-            <a href="#section-map"     class="dash-nav-link">Map</a>
-            <a href="#section-bpm"     class="dash-nav-link">Tempo</a>
-            <a href="#section-year"    class="dash-nav-link">History</a>
-            <a href="#section-student" class="dash-nav-link">Authors</a>
-            <a href="#section-tropes"  class="dash-nav-link">Lyrics</a>
-            <a href="#section-radar"   class="dash-nav-link">Signatures</a>
-            <a href="#section-fightiest" class="dash-nav-link">Rankings</a>
-            <a href="#section-heatmap" class="dash-nav-link">Co-occurrence</a>
+            <a href="#q1" class="dash-nav-link" data-nav><span class="q">Q1</span> Where</a>
+            <a href="#q2" class="dash-nav-link" data-nav><span class="q">Q2</span> When</a>
+            <a href="#half" class="dash-nav-link" data-nav><span class="q">HT</span> Sound</a>
+            <a href="#q3" class="dash-nav-link" data-nav><span class="q">Q3</span> Words</a>
+            <a href="#q4" class="dash-nav-link" data-nav><span class="q">Q4</span> Rivalry</a>
+            <a href="#ot" class="dash-nav-link" data-nav><span class="q">OT</span> Play</a>
+            <a href="#methods" class="dash-nav-link" data-nav>Methods</a>
+        </div>
+        <div class="nav-search">
+            <label for="school-search" class="sr-only">Find a school</label>
+            <input id="school-search" type="search" list="school-list" placeholder="Find your school…"
+                autocomplete="off">
+            <datalist id="school-list"></datalist>
+        </div>
+        <div class="yardline" aria-hidden="true">
+            <div class="yardline-ticks"></div>
+            <div class="yardline-ball"></div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="main-content">
-            <div id="section-legend" class="section">
-                <h3>Conference Color Legend</h3>
-                <p class="desc">Conferences group schools that often share similar traditions and competitive
-                    environments.
-                    Using color by conference makes it easier to spot patterns across regions and rivalries.
-                    As you scroll, notice how some musical traits repeat within the same conference.</p>
-                <div id="map-legend"></div>
-            </div>
-
-            <div id="section-map" class="section">
-                <h2>Where College Fight Songs Took Root</h2>
-                <p class="desc">Fight songs are distributed across the entire United States, reflecting the nationwide
-                    reach of college athletics.
-                    However, clear clusters appear in the <strong>Midwest and Southeast,</strong> regions with
-                    long-standing college football traditions and dense concentrations of major programs.
-                    Clicking on a stadium links geography to sound.</p>
-                <div id="map-vis" class="chart-container"></div>
-            </div>
-
-            <div class="section-row">
-                <div id="section-bpm" class="section">
-                    <h2>Tempo (Beats Per Minute)</h2>
-                    <p class="desc">Most fight songs cluster in two tempo ranges: roughly <strong>70–85 BPM and 130–165
-                            BPM.</strong>
-                        Tempo alone, however, does not determine how energetic a song feels, arrangement, rhythm and
-                        instrumentation also play an important role.
-                        For example, <i>Mighty Oregon (University of Oregon)</i> and <i>Ride ‘Em Cowboys (Oklahoma State
-                            University)</i>
-                        sit at very different tempos, yet both sound energetic and are well suited for marching and crowd
-                        participation.</p>
-                    <div id="bpm-vis" class="chart-container"></div>
-                </div>
-
-                <div id="section-duration" class="section">
-                    <h2>Song Length (Seconds)</h2>
-                    <p class="desc">Fight songs are usually short so they can be easily repeated during games.
-                        Most songs last between <strong>40 and 100 seconds,</strong> while longer songs often include
-                        repeated sections or verses.
-                        For example, <i>Aggie War Hymn (Texas A&M University)</i> repeats the same melody multiple times,
-                        illustrating how fight songs
-                        prioritize being catchy, repeatable and functional in a stadium setting.</p>
-                    <div id="duration-vis" class="chart-container"></div>
-                </div>
-            </div>
-
-            <div id="section-scatter" class="section">
-                <h2>Energy vs. Stamina</h2>
-                <p class="desc">
-                    This chart compares <strong>tempo (BPM)</strong> with <strong>song length (seconds)</strong> to
-                    examine how energy relates to duration in fight songs.
-                    While tempo clearly clusters into a few common ranges, song length appears much more variable, with
-                    no strong pattern tied to tempo.
-                    This suggests that tempo follows shared musical conventions, whereas duration is shaped more by
-                    tradition, structure or ceremonial use than by speed.
+    <main>
+        <!-- ================= Q1 WHERE ================= -->
+        <section id="q1" class="chapter">
+            <div class="chapter-head">
+                <p class="chapter-kicker">1st Quarter</p>
+                <h2 class="chapter-title">Where the songs took root</h2>
+                <p class="chapter-lede">Every dot on this map is a stadium, and every dot is beating at the tempo of
+                    its fight song. Scroll to see how conferences, realignment and rivalries carve up the country.
                 </p>
-                <div id="scatter-vis" class="chart-container"></div>
             </div>
-        </div>
 
-        <div class="info-panel-wrapper">
-            <div class="info-panel-header">
-                <span class="info-panel-title">School Details</span>
-            </div>
-            <div class="info-panel-content">
-                <div id="default-msg" class="placeholder-text">
-                    Click any school on the map or charts to explore its fight song, tempo, and lyrics.
+            <div class="scrolly">
+                <div class="scrolly-graphic">
+                    <div class="map-toolbar" id="map-toolbar"></div>
+                    <div id="main-map" class="map-frame"></div>
+                    <div class="map-legend" id="main-legend"></div>
                 </div>
-
-                <div id="detail-content" class="detail-content is-hidden">
-                    <div>
-                        <div class="panel-header">School</div>
-                        <div class="panel-value large" id="info-school"></div>
+                <div class="scrolly-steps">
+                    <div class="step" data-step="pulse">
+                        <h3>65 heartbeats</h3>
+                        <p>Each stadium pulses at its song's tempo. Lighter, quicker dots are faster songs. Even before
+                            any analysis, you can <em>see</em> there is no obvious “fast region” of the country.</p>
+                        <p class="step-hint">Click any dot to open the school's card and hear the song.</p>
                     </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <div class="panel-header">State</div>
-                            <div class="panel-value" id="info-state"></div>
-                        </div>
-                        <div class="col">
-                            <div class="panel-header">Conference</div>
-                            <div class="panel-value conference-value" id="info-conf"></div>
-                        </div>
-                        <div class="col">
-                            <div class="panel-header">Year</div>
-                            <div class="panel-value" id="info-year"></div>
-                        </div>
+                    <div class="step" data-step="conference">
+                        <h3>The 2019 map</h3>
+                        <p>In 2019, when FiveThirtyEight collected this data, the five power conferences were tidy
+                            regional blocs. The shaded shapes are each conference's footprint (its convex hull).</p>
+                        <p class="stat-line">Big Ten members were on average <strong
+                                data-k="disp.2019.Big Ten">—</strong> apart.</p>
                     </div>
-
-                    <div class="panel-header">Song Name</div>
-                    <div class="panel-value panel-value-text" id="info-song"></div>
-
-                    <div class="panel-header">Writer(s)</div>
-                    <div class="panel-value panel-value-text" id="info-writer"></div>
-
-                    <div class="panel-header">Listen</div>
-                    <div class="panel-value">
-                        <div class="spotify-container" id="spotify-embed"></div>
+                    <div class="step" data-step="realign">
+                        <h3>2024: the map is redrawn</h3>
+                        <p>Realignment pulled USC, UCLA, Oregon and Washington into the Big Ten, Texas and Oklahoma into
+                            the SEC, and Stanford and Cal into the <em>Atlantic</em> Coast Conference. Only Oregon State
+                            and Washington State were left in the Pac-12.</p>
+                        <p class="stat-line">Average Big Ten distance: <strong data-k="disp.2019.Big Ten">—</strong>
+                            → <strong data-k="disp.2024.Big Ten">—</strong>. The ACC: <strong
+                                data-k="disp.2019.ACC">—</strong> → <strong data-k="disp.2024.ACC">—</strong>.</p>
                     </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <div class="panel-header">TEMPO</div>
-                            <div class="panel-value" id="info-tempo"></div>
-                        </div>
-                        <div class="col">
-                            <div class="panel-header">Song Length</div>
-                            <div class="panel-value" id="info-length"></div>
-                        </div>
+                    <div class="step" data-step="turf">
+                        <h3>Every song has a turf</h3>
+                        <p>Split the country by whichever stadium is closest and you get each song's “home turf”
+                            (a Voronoi diagram). Drop a pin anywhere and you know which fight song you'd hear on
+                            Saturday.</p>
+                        <p class="step-hint">Try <button class="inline-btn" data-action="near-me">find my nearest
+                                fight song</button>.</p>
                     </div>
-
-                    <div class="panel-header">Key Words in Fight Song Lyrics</div>
-                    <div class="panel-value">
-                        <div id="mini-radar" class="mini-radar"></div>
+                    <div class="step" data-step="rivals">
+                        <h3>Lines of hostility</h3>
+                        <p>33 classic rivalries connect these schools. Most are short: the average rival is <strong
+                                data-k="rivals.km">—</strong> away, versus <strong data-k="rivals.allkm">—</strong>
+                            for a random pair. Rivalry is mostly a neighbourhood affair.</p>
+                    </div>
+                    <div class="step" data-step="explore">
+                        <h3>Your turn</h3>
+                        <p>Use the toolbar to recolor the map, switch eras, or toggle layers. Click a conference in the
+                            legend to filter every chart on the page.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="bottom-container">
-        <div id="section-year" class="section">
-            <h2>When Fight Songs Were Written</h2>
-            <p class="desc">There is a clear <strong>“golden age"</strong> of fight song composition between
-                <strong>1905 and 1925</strong>, which aligns with the rapid rise of college football in the United
-                States.
-                Few new fight songs have been written since then, suggesting traditions tend to persist once
-                established.
-                The oldest song in the dataset, <i>The Good Old Song (University of Virginia),</i> dates back to 1893.
-            </p>
-            <div id="year-vis" class="chart-container"></div>
-        </div>
-
-        <div id="section-student" class="section">
-            <h2>Written by Students?</h2>
-            <p class="desc">Nearly <strong>half</strong> of all fight songs (about 49%) were written by students,
-                highlighting their direct role in shaping school traditions and spirit.
-                Rather than being purely institutional creations, many fight songs originated from within the student
-                body itself.
-                This helps explain why these songs often feel personal, enduring and closely tied to campus identity.
-                The variety of schools represented shows that student-driven traditions span conferences and regions,
-                not just a single type of institution.</p>
-            <div class="student-map-row">
-                <div id="student-vis" class="chart-container"></div>
-                <div id="student-map-vis" class="chart-container"></div>
+            <div class="panel-grid">
+                <article class="panel">
+                    <h3 class="panel-title">Realignment stretched the conferences</h3>
+                    <p class="desc">Average distance between member stadiums, 2019 vs 2024–26 (schools in this
+                        dataset only). Longer bars mean longer road trips — and less regional identity.</p>
+                    <div id="realign-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">Does geography shape the sound?</h3>
+                    <p class="desc">We tested whether nearby schools have similar songs using <strong>Moran's
+                            I</strong> (each school vs its 5 nearest neighbours, 9,999 random shuffles). Grey
+                        histograms show what “no geographic pattern” looks like; the line is the real data.</p>
+                    <div id="moran-cards" class="moran-grid"></div>
+                </article>
             </div>
-        </div>
-        <div class="section-row">
-            <div id="section-tropes" class="section">
-                <h2>Common Lyrics and Chants</h2>
-                <p class="desc">Unsurprisingly, the word <strong>"fight"</strong> appears most frequently across lyrics,
-                    followed by common terms such as “win," “victory" and references to school colors.
-                    These simple and repetitive phrases make fight songs easy to remember and chant together in a crowd.
-                    Although <strong>nonsense</strong> syllables or chants appear less often overall, they may function less
-                    as filler and more as a marker of belonging, helping songs feel distinctive and meaningful to school
-                    communities.</p>
-                <div id="tropes-vis" class="chart-container"></div>
-            </div>
+        </section>
 
-            <div id="section-radar" class="section">
-                <h2>Conference “Sonic Signatures"</h2>
-                <p class="desc">
-                    Compare the average profile of two conferences. Who has more fight songs with the word
-                    <strong>"Fight"</strong>?
-                </p>
-                <div class="radar-controls">
-                    <div id="radar-dropdown-1" class="custom-dropdown custom-dropdown-conference"></div>
-                    <span class="vs-label">VS</span>
-                    <div id="radar-dropdown-2" class="custom-dropdown custom-dropdown-conference"></div>
+        <!-- ================= Q2 WHEN ================= -->
+        <section id="q2" class="chapter">
+            <div class="chapter-head">
+                <p class="chapter-kicker">2nd Quarter</p>
+                <h2 class="chapter-title">A golden age, 1905–1925</h2>
+                <p class="chapter-lede">Just over half of all dated fight songs were written in two decades, as college
+                    football exploded in popularity. Press play to watch them appear across the map.</p>
+            </div>
+            <div class="panel-grid panel-grid--wide-left">
+                <article class="panel">
+                    <h3 class="panel-title">When each song was written</h3>
+                    <div id="timeline-chart" class="chart"></div>
+                    <div id="cumulative-chart" class="chart"></div>
+                    <p class="note"><span data-k="years.unknown">—</span> songs have no known year and are not shown.
+                    </p>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">Spreading across the map</h3>
+                    <div class="play-controls">
+                        <button id="time-play" class="btn btn-primary" type="button">▶ Play</button>
+                        <input id="time-slider" type="range" min="1890" max="1970" step="1" value="1970"
+                            aria-label="Year">
+                        <span id="time-year" class="year-readout">1970</span>
+                    </div>
+                    <div id="time-map" class="chart"></div>
+                    <p class="note">The gold trail follows the <em>centre of gravity</em> of every song written so far,
+                        decade by decade.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= HALFTIME SOUND ================= -->
+        <section id="half" class="chapter">
+            <div class="chapter-head">
+                <p class="chapter-kicker">Halftime</p>
+                <h2 class="chapter-title">Two tempos — or one?</h2>
+                <p class="chapter-lede">The raw data shows two clusters of tempo: around 75 BPM and around 150 BPM. But
+                    75 is exactly half of 150. Marching band music is often written in cut time, so the same pulse can
+                    be counted either way.</p>
+            </div>
+            <div class="panel-grid">
+                <article class="panel panel--span">
+                    <div class="panel-title-row">
+                        <h3 class="panel-title">Tempo (beats per minute)</h3>
+                        <div class="segmented" id="tempo-toggle" role="group" aria-label="Tempo mode">
+                            <button type="button" data-value="raw" aria-pressed="true">Raw BPM</button>
+                            <button type="button" data-value="folded" aria-pressed="false">Folded BPM</button>
+                        </div>
+                    </div>
+                    <p class="desc">Folding doubles every song under 100 BPM (<span data-k="tempo.n_folded">—</span>
+                        songs). The bimodality coefficient drops from <strong data-k="tempo.bc_raw">—</strong> to
+                        <strong data-k="tempo.bc_folded">—</strong> (above 0.555 suggests two peaks). Once the counting
+                        is aligned, nearly every fight song lives in the same 130–180 BPM march range.
+                    </p>
+                    <div id="tempo-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">Song length (seconds)</h3>
+                    <p class="desc">Most songs run 40–100 seconds. The long tail is repeats: <i>Aggie War Hymn</i>
+                        cycles the same melody several times.</p>
+                    <div id="duration-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">Energy vs. stamina</h3>
+                    <p class="desc">Tempo against length. The quadrants are a playful guide, not a statistical
+                        grouping.</p>
+                    <div id="scatter-chart" class="chart"></div>
+                </article>
+                <article class="panel panel--span tap-panel">
+                    <h3 class="panel-title">Tap the tempo</h3>
+                    <div class="tap-layout">
+                        <div>
+                            <p class="desc">Tap the pad (or press <kbd>Space</kbd> while it's focused) to a beat in your
+                                head. We'll find the fight songs that march at your speed.</p>
+                            <button id="tap-pad" class="tap-pad" type="button" aria-describedby="tap-readout">
+                                <span class="tap-label">TAP</span>
+                            </button>
+                        </div>
+                        <div>
+                            <div id="tap-readout" class="tap-readout" aria-live="polite">
+                                <span class="tap-bpm">—</span><span class="tap-unit">BPM</span>
+                            </div>
+                            <ol id="tap-matches" class="tap-matches"></ol>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= Q3 WORDS ================= -->
+        <section id="q3" class="chapter">
+            <div class="chapter-head">
+                <p class="chapter-kicker">3rd Quarter</p>
+                <h2 class="chapter-title">Fight, win, rah — repeat</h2>
+                <p class="chapter-lede">FiveThirtyEight tagged eight lyrical clichés in every song. Some are nearly
+                    universal; others mark out a school's personality.</p>
+            </div>
+            <div class="panel-grid">
+                <article class="panel panel--span">
+                    <h3 class="panel-title">Who uses which cliché?</h3>
+                    <p class="desc">Each dot is a song that uses the trope, grouped by conference. Hover for the school,
+                        click to open its card.</p>
+                    <div id="tropes-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <div class="panel-title-row">
+                        <h3 class="panel-title">Conference signatures</h3>
+                    </div>
+                    <div class="chip-row" id="trope-picker" role="group" aria-label="Choose a trope"></div>
+                    <p class="desc" id="conf-trope-desc"></p>
+                    <div id="conf-trope-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">Which clichés travel together?</h3>
+                    <p class="desc">Correlation (φ) between tropes. <span class="swatch swatch--pos"></span> appear
+                        together more than chance; <span class="swatch swatch--neg"></span> tend to exclude each other.
+                    </p>
+                    <div id="phi-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">The “fightiest” songs</h3>
+                    <p class="desc">Each football is one shout of “fight”. <i>Texas Fight</i> is in a league of its
+                        own.</p>
+                    <div id="fightiest-chart" class="chart"></div>
+                </article>
+                <article class="panel">
+                    <h3 class="panel-title">Written by students?</h3>
+                    <p class="desc">One square per song. Students wrote about half of them, a reminder that many
+                        traditions started in the stands, not the president's office.</p>
+                    <div id="student-chart" class="chart"></div>
+                </article>
+                <article class="panel panel--span">
+                    <h3 class="panel-title">Four kinds of fight song</h3>
+                    <p class="desc">Clustering songs by tempo, length, era, authorship and all eight tropes (Gower
+                        distance, Ward linkage) gives four archetypes. Songs that sit close together in this
+                        “galaxy” are musically similar.</p>
+                    <div class="galaxy-layout">
+                        <div id="galaxy-chart" class="chart"></div>
+                        <div id="archetype-cards" class="archetype-cards"></div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= Q4 RIVALRY ================= -->
+        <section id="q4" class="chapter">
+            <div class="chapter-head">
+                <p class="chapter-kicker">4th Quarter</p>
+                <h2 class="chapter-title">Face-off</h2>
+                <p class="chapter-lede">Do rivals sound alike, or do they deliberately sound different? Pick a rivalry
+                    and put the two songs head to head.</p>
+            </div>
+            <div class="panel-grid panel-grid--wide-left">
+                <article class="panel">
+                    <h3 class="panel-title">33 rivalries</h3>
+                    <div id="rivalry-map" class="chart"></div>
+                    <div id="rivalry-list" class="rivalry-list" role="listbox" aria-label="Rivalries"></div>
+                </article>
+                <article class="panel faceoff-panel">
+                    <h3 class="panel-title">Head to head</h3>
+                    <div id="faceoff"></div>
+                </article>
+            </div>
+            <div class="panel-grid">
+                <article class="panel panel--span">
+                    <h3 class="panel-title">Near neighbours, different songs</h3>
+                    <p class="desc">Every pair of schools (<span data-k="pairs.n">—</span> pairs): distance apart vs
+                        how different their songs are. If neighbours copied each other, points would rise to the right.
+                        They don't (Mantel r = <strong data-k="mantel.r">—</strong>, p = <strong
+                            data-k="mantel.p">—</strong>). Rivals, in gold, are <em>no more alike</em> than random pairs
+                        (permutation p = <strong data-k="rivals.p">—</strong>).</p>
+                    <div id="pairs-chart" class="chart"></div>
+                </article>
+                <article class="panel panel--span">
+                    <div class="panel-title-row">
+                        <h3 class="panel-title">Local hot and cold spots</h3>
+                        <div class="segmented" id="lisa-toggle" role="group" aria-label="LISA variable">
+                            <button type="button" data-value="bpm_folded" aria-pressed="true">Tempo</button>
+                            <button type="button" data-value="trope_count" aria-pressed="false">Tropes</button>
+                        </div>
+                    </div>
+                    <p class="desc">Local Moran's I (LISA) flags schools whose neighbourhood is unusually high or low.
+                        With 65 schools and many tests, treat these as hints, not findings.</p>
+                    <div class="lisa-layout">
+                        <div id="lisa-map" class="chart"></div>
+                        <div id="lisa-legend" class="lisa-legend"></div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= OVERTIME PLAY ================= -->
+        <section id="ot" class="chapter">
+            <div class="chapter-head">
+                <p class="chapter-kicker">Overtime</p>
+                <h2 class="chapter-title">Where's that fight song?</h2>
+                <p class="chapter-lede">Five songs, no names. Read the clues, listen if you like, then drop a pin where
+                    you think the stadium is. The closer you are, the more points.</p>
+            </div>
+            <div class="panel-grid panel-grid--wide-left">
+                <article class="panel">
+                    <div id="guess-map" class="chart guess-map"></div>
+                </article>
+                <article class="panel">
+                    <div id="guess-panel" class="guess-panel"></div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= METHODS ================= -->
+        <section id="methods" class="chapter chapter--methods">
+            <div class="chapter-head">
+                <p class="chapter-kicker">Post-game</p>
+                <h2 class="chapter-title">Methods &amp; caveats</h2>
+            </div>
+            <div class="methods-grid">
+                <div>
+                    <h3>Data</h3>
+                    <ul>
+                        <li>Fight song metadata and lyric tropes: FiveThirtyEight, with BTAA updates. Stadium
+                            coordinates: CFBD API.</li>
+                        <li>The BTAA update mixes years (some schools already in their 2024 conference, others not),
+                            so conference membership was re-coded for 2019 and 2024–26.</li>
+                        <li>Rivalries are a curated list of 33 long-running series between schools in the dataset.</li>
+                    </ul>
                 </div>
-                <div id="radar-vis" class="chart-container chart-container-centered"></div>
+                <div>
+                    <h3>Analysis</h3>
+                    <ul>
+                        <li><strong>Folded tempo</strong>: songs under 100 BPM are doubled, a common correction for
+                            half-time counting.</li>
+                        <li><strong>Musical distance</strong>: Gower distance over folded BPM (weight 2), length,
+                            year, student authorship and eight tropes.</li>
+                        <li><strong>Spatial statistics</strong>: Moran's I and LISA with 5-nearest-neighbour weights;
+                            Mantel test between great-circle and musical distance. All p-values come from 9,999
+                            permutations (999 for LISA).</li>
+                        <li><strong>Conference differences</strong>: permutation χ² test; intervals are Wilson 95%.
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Caveats</h3>
+                    <ul>
+                        <li>65 songs is a small sample. Several conferences have fewer than 15 schools, so a single
+                            song moves a percentage by 7+ points.</li>
+                        <li>Eight tests on conference differences means one “significant” result is not surprising
+                            by chance alone.</li>
+                        <li>Reproduce everything with <code>python analysis/build_data.py</code>.</li>
+                    </ul>
+                </div>
             </div>
-        </div>
+        </section>
+    </main>
 
-        <div class="section-row">
-            <div id="section-fightiest" class="section">
-                <h2>Top 10 “Fightiest" Schools</h2>
-                <p class="desc">
-                    Some schools lean heavily into the word <strong>"fight"</strong> as a core part of their musical
-                    identity.
-                    <i>Texas Fight (University of Texas)</i> stands out by a wide margin, with significantly more “fight"
-                    mentions than any other school, while the rest of the top ten cluster much closer together.
-                    This suggests that while nearly all fight songs emphasize competition, a few schools amplify that
-                    message far more aggressively than others.
-                </p>
-                <div id="fightiest-vis" class="chart-container"></div>
-            </div>
-
-            <div id="section-heatmap" class="section">
-                <h2>Lyric Co-occurrence</h2>
-                <p class="desc">
-                    This matrix shows how often different lyric tropes appear together within the same fight song.
-                    Competitive terms such as <strong>"fight," “win," and “victory"</strong> frequently co-occur, indicating
-                    that these words tend to reinforce one another rather than appear in isolation.
-                    In contrast, elements like <strong>"nonsense" and “rah"</strong> show weaker co-occurrence with other
-                    tropes, suggesting they are used more selectively to add character rather than to carry the main
-                    competitive message.
-                </p>
-                <div id="heatmap-vis" class="chart-container"></div>
-            </div>
-        </div>
-    </div>
+    <!-- ================= SCHOOL CARD (drawer) ================= -->
+    <aside id="card" class="card-drawer" aria-label="School details" aria-hidden="true">
+        <div class="card-inner" id="card-inner"></div>
+    </aside>
 
     <footer class="footer">
         <p>
-            This interactive story was inspired by the
-            <a href="https://btaa.org/technology/love-data-week/data-viz-student-championship" target="_blank">
-                BTAA Data Visualization Student Championship
-            </a>
-            and an example visualization by
-            <a href="https://web.archive.org/web/20250305132007/https:/projects.fivethirtyeight.com/college-fight-song-lyrics/"
-                target="_blank">
-                FiveThirtyEight
-            </a>.
-        </p>
-
-        <p>
-            The original fight song dataset comes from
-            <a href="https://github.com/fivethirtyeight/data/blob/master/fight-songs/fight-songs.csv" target="_blank">
-                FiveThirtyEight
-            </a>,
-            with updates provided by BTAA for the competition.
-            Stadium location data was retrieved using the
-            <a href="https://collegefootballdata.com/" target="_blank">
-                CFBD API
-            </a>.
-        </p>
-
-        <p>
-            The cover image is sourced from
-            <a href="https://mix108.com/wisconsin-jump-around-tradition/" target="_blank">
-                mix108.com
-            </a>,
-            and the football icon is from
-            <a href="https://www.svgrepo.com/svg/401099/american-football" target="_blank">
-                SVG Repo
-            </a>.
-        </p>
-
-        <p>
-            Built with
-            <a href="https://d3js.org/" target="_blank">D3.js</a>
+            Inspired by the
+            <a href="https://btaa.org/technology/love-data-week/data-viz-student-championship" target="_blank"
+                rel="noopener">BTAA Data Visualization Student Championship</a>
             and
-            <a href="https://fonts.google.com/" target="_blank">Google Fonts</a>.
+            <a href="https://web.archive.org/web/20250305132007/https:/projects.fivethirtyeight.com/college-fight-song-lyrics/"
+                target="_blank" rel="noopener">FiveThirtyEight's fight song lyrics project</a>.<br>
+            Data:
+            <a href="https://github.com/fivethirtyeight/data/blob/master/fight-songs/fight-songs.csv" target="_blank"
+                rel="noopener">FiveThirtyEight</a>,
+            BTAA updates, and the <a href="https://collegefootballdata.com/" target="_blank" rel="noopener">CFBD
+                API</a>.<br>
+            Cover image: <a href="https://mix108.com/wisconsin-jump-around-tradition/" target="_blank"
+                rel="noopener">mix108.com</a>. Icon: <a href="https://www.svgrepo.com/svg/401099/american-football"
+                target="_blank" rel="noopener">SVG Repo</a>.<br>
+            Built with <a href="https://d3js.org/" target="_blank" rel="noopener">D3.js</a>.<br>
+            Source: <a href="https://github.com/cat-grep/TheRhythmOfRivalry" target="_blank"
+                rel="noopener">GitHub</a>.
         </p>
-
-        <p>
-            Source code:
-            <a href="https://github.com/cat-grep/TheRhythmOfRivalry" target="_blank">
-                GitHub Repository
-            </a>
-        </p>
-
         <p class="footer-author">
             <strong>Eugenie Huang</strong><br>
-            Master’s Student in Cartography & Geographic Information Systems<br>
-            University of Wisconsin-Madison<br>
+            Master's Student in Cartography &amp; GIS<br>
+            University of Wisconsin–Madison<br>
             <a href="mailto:huang674@wisc.edu">huang674@wisc.edu</a>
         </p>
     </footer>
 
-
-    <script src="app.js"></script>
+    <script type="module" src="src/main.js"></script>
 </body>
 
 </html>
