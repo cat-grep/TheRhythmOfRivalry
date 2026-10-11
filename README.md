@@ -8,11 +8,70 @@ The application was inspired by the **BTAA Data Visualization Student Championsh
 [Live Demo✨](https://cat-grep.github.io/TheRhythmOfRivalry/)
 
 
+## The Story
+
+The page is structured like a football game:
+
+| Chapter | What it shows |
+|---|---|
+| **Q1 Where** | Scroll-driven hero map: stadiums pulse at their song's tempo; conference footprints in 2019 vs 2024–26 realignment; Voronoi "home turf"; rivalry arcs; Moran's I tests for geographic clustering |
+| **Q2 When** | Beeswarm timeline + cumulative curve; animated map with the decade-by-decade centre of gravity |
+| **Halftime Sound** | Raw vs *folded* tempo (half-time correction), song length, tempo × length, and a "tap the tempo" game |
+| **Q3 Words** | Trope unit chart, conference signatures with Wilson intervals + permutation tests, φ correlation matrix, "fightiest" isotype, student-author waffle, archetype clustering |
+| **Q4 Rivalry** | 33 rivalries with a head-to-head face-off, geographic vs musical distance for all 2,080 pairs (Mantel test), LISA hot spots |
+| **Overtime Play** | "Where's that fight song?" — guess the stadium from clues and audio, scored by great-circle distance |
+
+Every chart is linked: selecting a school anywhere opens its card and highlights it everywhere; clicking a conference in the map legend filters the whole page. Views can be shared via the URL (`#school=Wisconsin`, `#rivalry=The Game`).
+
+
+## Running Locally
+
+The page loads JSON, so it must be served (opening `index.html` directly will not work):
+
+```bash
+python -m http.server 8000
+# open http://localhost:8000
+```
+
+To rebuild the processed data and statistics after editing anything in `data/`:
+
+```bash
+python analysis/build_data.py   # needs numpy, scipy, scikit-learn
+```
+
+
+## Project Structure
+
+```
+index.html, style.css
+src/
+  main.js          data loading, linking, URL hash, nav
+  state.js         shared state store
+  theme.js         colours, shapes, formatters (palette validated for colour-vision deficiency)
+  encode.js        "color by" encodings for the map
+  geo.js           projection + distance helpers
+  scrolly.js       scroll-driven map steps
+  card.js          school card drawer
+  audio.js         metronome / tap clicks (Web Audio)
+  maps/mainMap.js  hero map
+  charts/          geoStats, timeline, sound, words, rivalry
+  games/geoGuess.js
+analysis/build_data.py   reproducible statistics → data/processed/*.json
+data/
+  fight-songs-with-coordinates.csv
+  schools-extra.csv      state + 2019 / 2024 conference membership
+  rivalries.csv          curated rivalry list
+  processed/             generated: songs.json, analysis.json
+```
+
+
 ## Technologies Used
 
 - **D3.js (v7)** – interactive data visualizations  
 - **TopoJSON** – U.S. state geometry  
-- **HTML / CSS / JavaScript** – application structure and styling  
+- **Python (NumPy, SciPy, scikit-learn)** – spatial statistics, permutation tests, clustering, MDS  
+- **HTML / CSS / JavaScript (ES modules)** – application structure and styling  
+- **Web Audio API** – metronome and tap-tempo clicks  
 - **Google Fonts** – typography  
 - **Spotify Embed** – music playback
 
